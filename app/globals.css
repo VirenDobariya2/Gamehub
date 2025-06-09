@@ -1,0 +1,122 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
+    --primary: 346 100% 60%;
+    --primary-foreground: 355.7 100% 97.3%;
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
+    --accent: 240 4.8% 95.9%;
+    --accent-foreground: 240 5.9% 10%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 346 100% 60%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 240 10% 8%;
+    --foreground: 0 0% 98%;
+    --card: 240 10% 12%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 10% 8%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 346 100% 60%;
+    --primary-foreground: 355.7 100% 97.3%;
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+    --accent: 240 3.7% 15.9%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 346 100% 60%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+@layer components {
+  .game-card {
+    @apply relative overflow-hidden rounded-lg transition-all duration-300 hover:scale-105 hover:shadow-lg;
+  }
+
+  .game-card-image {
+    @apply aspect-video w-full object-cover;
+  }
+
+  .game-card-title {
+    @apply mt-2 text-sm font-medium;
+  }
+
+  .game-grid {
+    @apply grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5;
+  }
+
+  .category-card {
+    @apply relative overflow-hidden rounded-lg transition-all duration-300 hover:scale-105 hover:shadow-lg;
+  }
+
+  .category-card-image {
+    @apply aspect-video w-full object-cover brightness-75;
+  }
+
+  .category-card-title {
+    @apply absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/80 to-transparent p-3 text-lg font-bold;
+  }
+
+  .sidebar-link {
+    @apply flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-colors hover:bg-secondary hover:text-white;
+  }
+
+  .sidebar-link.active {
+    @apply bg-secondary text-white;
+  }
+
+  .game-iframe-container {
+    @apply relative aspect-video w-full overflow-hidden rounded-lg;
+  }
+
+  .game-iframe {
+    @apply h-full w-full border-0;
+  }
+
+  .rating-bar {
+    @apply h-2 rounded-full bg-secondary;
+  }
+
+  .rating-bar-fill {
+    @apply h-full rounded-full bg-primary;
+  }
+
+  /* Enhanced rating distribution bars */
+  .rating-distribution-bar {
+    @apply h-3 flex-1 overflow-hidden rounded-full bg-secondary transition-all duration-500;
+  }
+
+  .rating-distribution-fill {
+    @apply h-full rounded-full bg-primary transition-all duration-500;
+  }
+}
