@@ -5,20 +5,14 @@ import { Heart } from "lucide-react"
 import { useFavorites } from "@/components/favorites-context"
 import { useToast } from "@/hooks/use-toast"
 
-interface FavoriteButtonProps {
-  game: {
-    id: string
-    title: string
-    image: string
-    href: string
-    category: string
-    rating: number
-  }
-  variant?: "default" | "icon"
-  className?: string
-}
+/**
+ * @typedef {Object} FavoriteButtonProps
+ * @property {{ id: string, title: string, image: string, href: string, category: string, rating: number }} game
+ * @property {"default" | "icon"} [variant]
+ * @property {string} [className]
+ */
 
-export function FavoriteButton({ game, variant = "default", className }: FavoriteButtonProps) {
+export function FavoriteButton({ game, variant = "default", className }) {
   const { addToFavorites, removeFromFavorites, isFavorite } = useFavorites()
   const { toast } = useToast()
   const isGameFavorite = isFavorite(game.id)
@@ -31,7 +25,7 @@ export function FavoriteButton({ game, variant = "default", className }: Favorit
         description: `${game.title} has been removed from your favorites.`,
       })
     } else {
-      addToFavorites(game)
+      addToFavorites({ ...game, addedDate: new Date().toISOString() })
       toast({
         title: "Added to favorites",
         description: `${game.title} has been added to your favorites.`,
@@ -50,7 +44,7 @@ export function FavoriteButton({ game, variant = "default", className }: Favorit
 
   return (
     <Button onClick={handleToggleFavorite} className={`flex items-center gap-2 ${className}`}>
-      <Heart className={`h-4 w-4 ${isGameFavorite ? "fill-red-500 text-red-500" : ""}`} />
+      <Heart className={`h-4 w-4 ${isGameFavorite ? "fill-red-200 text-red-500" : ""}`} />
       {isGameFavorite ? "Remove from Favorites" : "Add to Favorites"}
     </Button>
   )

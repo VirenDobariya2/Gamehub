@@ -20,7 +20,7 @@ export default function TrendingPage() {
     Today: Array.from({ length: 12 }).map((_, i) => ({
       id: `today-game-${i + 1}`,
       title: `Today's Hit ${i + 1}`,
-      image: `/placeholder.svg?height=200&width=350`,
+      image: `/gamethub.webp`,
       href: `/games/today-game-${i + 1}`,
       playCount: Math.floor(Math.random() * 5000) + 1000,
       trendingRank: i + 1,
@@ -30,7 +30,7 @@ export default function TrendingPage() {
     "This Week": Array.from({ length: 18 }).map((_, i) => ({
       id: `week-game-${i + 1}`,
       title: `Weekly Trending ${i + 1}`,
-      image: `/placeholder.svg?height=200&width=350`,
+      image: `/gamethub.webp`,
       href: `/games/week-game-${i + 1}`,
       playCount: Math.floor(Math.random() * 25000) + 5000,
       trendingRank: i + 1,
@@ -40,7 +40,7 @@ export default function TrendingPage() {
     "This Month": Array.from({ length: 24 }).map((_, i) => ({
       id: `month-game-${i + 1}`,
       title: `Monthly Popular ${i + 1}`,
-      image: `/placeholder.svg?height=200&width=350`,
+      image: `/gamethub.webp`,
       href: `/games/month-game-${i + 1}`,
       playCount: Math.floor(Math.random() * 100000) + 10000,
       trendingRank: i + 1,

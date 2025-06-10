@@ -39,7 +39,7 @@ export function GameCard({
       <div className="relative overflow-hidden rounded-lg">
         <Link href={href}>
           <img
-            src={image || "/placeholder.svg"}
+            src={image || "/gamethub.webp"}
             alt={title}
             className="game-card-image transition-transform duration-300 hover:scale-105"
           />

@@ -1,33 +1,21 @@
-import type React from "react"
-import type { Metadata } from "next/dist/lib/metadata/types/metadata-interface"
+import type { ReactNode } from "react"
 import { Inter } from "next/font/google"
 import "./globals.css"
-import { ThemeProvider } from "@/components/theme-provider"
-import { Toaster } from "@/components/ui/toaster"
-import { FavoritesProvider } from "@/components/favorites-context"
+import Provider from "./provider"
 
 const inter = Inter({ subsets: ["latin"] })
 
-export const metadata: Metadata = {
+export const metadata = {
   title: "GameHub - Play Free Online Games",
-  description: "Play thousands of free online games directly in your browser. No downloads, no installs - just play!",
-    generator: 'v0.dev'
+  description:
+    "Play thousands of free online games directly in your browser. No downloads, no installs – just play!",
 }
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.className} bg-[#1a1419] text-white antialiased`}>
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
-          <FavoritesProvider>
-            {children}
-            <Toaster />
-          </FavoritesProvider>
-        </ThemeProvider>
+        <Provider>{children}</Provider>    
       </body>
     </html>
   )

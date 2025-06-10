@@ -1,5 +1,8 @@
 "use client"
 
+import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
+import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -9,17 +12,32 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Heart, Upload, User, Shield } from "lucide-react"
-import Link from "next/link"
-import { useState } from "react"
+import { Heart, User, Shield } from "lucide-react"
 import { NotificationDropdown } from "@/components/notifications"
 
 export function UserNav() {
-  // In a real app, you would check if the user is authenticated and their role
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [isAdmin, setIsAdmin] = useState(false) // Only admins can upload games
+  const router = useRouter()
+  const [user, setUser] = useState<{ username: string; email: string; role?: string } | null>(null)
 
-  if (!isAuthenticated) {
+  useEffect(() => {
+    const token = localStorage.getItem("token")
+    const userData = localStorage.getItem("user")
+    if (token && userData) {
+      setUser(JSON.parse(userData))
+    }
+  }, [])
+
+  const handleLogout = () => {
+    localStorage.removeItem("token")
+    localStorage.removeItem("user")
+    setUser(null)
+    router.push("/login")
+  }
+
+  const isAdmin = user?.role === "admin"
+  const initial = user?.username?.charAt(0).toUpperCase()
+
+  if (!user) {
     return (
       <div className="flex items-center gap-2">
         <Button variant="ghost" size="icon" asChild>
@@ -48,26 +66,17 @@ export function UserNav() {
         </Link>
       </Button>
       <NotificationDropdown />
-      {/* Only show upload button for admins */}
-      {isAdmin && (
-        <Button variant="default" asChild>
-          <Link href="/admin/games/new">
-            <Upload className="mr-2 h-4 w-4" />
-            Upload
-          </Link>
-        </Button>
-      )}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-            <img src="/placeholder.svg?height=32&width=32" alt="User" className="h-8 w-8 rounded-full" />
+          <Button variant="ghost" className="relative h-8 w-8 rounded-full bg-muted text-primary font-semibold">
+            {initial}
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-56" align="end" forceMount>
           <DropdownMenuLabel className="font-normal">
             <div className="flex flex-col space-y-1">
-              <p className="text-sm font-medium leading-none">Username</p>
-              <p className="text-xs leading-none text-muted-foreground">user@example.com</p>
+              <p className="text-sm font-medium leading-none">{user.username}</p>
+              <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
               {isAdmin && (
                 <div className="flex items-center gap-1 text-xs text-primary">
                   <Shield className="h-3 w-3" />
@@ -77,12 +86,6 @@ export function UserNav() {
             </div>
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem asChild>
-            <Link href="/profile">Profile</Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem asChild>
-            <Link href="/collections">My Collections</Link>
-          </DropdownMenuItem>
           <DropdownMenuItem asChild>
             <Link href="/settings">Settings</Link>
           </DropdownMenuItem>
@@ -98,7 +101,7 @@ export function UserNav() {
             </>
           )}
           <DropdownMenuSeparator />
-          <DropdownMenuItem>Log out</DropdownMenuItem>
+          <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     </div>

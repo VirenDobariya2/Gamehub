@@ -163,7 +163,7 @@ export default function GalacticConquestPage() {
 
             {/* Action Buttons */}
             <div className="mb-8 flex items-center gap-4">
-              <FavoriteButton game={game} />
+              <span className="text-sm text-muted-foreground">Share Game</span>
               <Button variant="outline">Share Game</Button>
             </div>
 

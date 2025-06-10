@@ -34,7 +34,7 @@ export default function HomePage() {
           <div className="relative mb-10 overflow-hidden rounded-lg">
             <div className="absolute inset-0 bg-gradient-to-r from-background/90 to-background/20"></div>
             <img
-              src="/placeholder.svg?height=400&width=1200"
+              src="/gamethub.webp"
               alt="Hero Banner"
               className="h-[400px] w-full object-cover"
             />
@@ -62,7 +62,7 @@ export default function HomePage() {
                   key={i}
                   id={`game-${i + 1}`}
                   title={`Game ${i + 1}`}
-                  image={`/placeholder.svg?height=200&width=350`}
+                  image={`/gamethub.webp`}
                   href={`/games/game-${i + 1}`}
                 />
               ))}

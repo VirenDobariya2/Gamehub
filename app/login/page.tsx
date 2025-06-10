@@ -40,9 +40,8 @@ export default function LoginPage() {
           title: "Login successful",
           description: "Welcome back to GameHub!",
         });
-
+        localStorage.setItem("token", data.token);
         localStorage.setItem("user", JSON.stringify(data.user));
-
         if (data.user.role === "admin") {
           router.push("/admin/dashboard");
         } else {
@@ -89,20 +88,24 @@ export default function LoginPage() {
             <Link href="/" className="inline-block">
               <h1 className="text-2xl font-bold text-white">GameHub</h1>
             </Link>
-            <h2 className="mt-6 text-3xl font-bold text-white">Welcome back!</h2>
+            <h2 className="mt-6 text-3xl font-bold text-white">
+              Welcome back!
+            </h2>
             <p className="mt-2 text-muted-foreground">
               Please enter your credentials to continue
             </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
-           <div className="space-y-2">
+            <div className="space-y-2">
               <Input
                 type="email"
                 placeholder="Email address"
                 className="bg-secondary"
                 value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, email: e.target.value })
+                }
                 required
               />
             </div>
@@ -114,7 +117,9 @@ export default function LoginPage() {
                 placeholder="Password"
                 className="bg-secondary pr-10"
                 value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, password: e.target.value })
+                }
                 required
               />
               <button
@@ -191,7 +196,10 @@ export default function LoginPage() {
           </p>
 
           <Button variant="ghost" asChild className="mt-4">
-            <Link href="/" className="flex items-center text-muted-foreground hover:text-primary">
+            <Link
+              href="/"
+              className="flex items-center text-muted-foreground hover:text-primary"
+            >
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back to Home
             </Link>

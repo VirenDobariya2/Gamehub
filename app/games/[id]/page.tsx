@@ -20,8 +20,8 @@ export function generateMetadata({ params }: GamePageProps): Metadata {
   }
 }
 
-export default function GamePage({ params }: GamePageProps) {
-  // In a real app, you would fetch the game data based on the ID
+export default async function GamePage({ params }: GamePageProps) {
+  // Simulated fetched game data
   const game = {
     id: params.id,
     title: "Cosmic Clash",
@@ -37,17 +37,16 @@ export default function GamePage({ params }: GamePageProps) {
       { stars: 1, percentage: 5 },
     ],
     tags: ["Action", "Multiplayer", "Shooter", "Space", "Combat"],
-    image: "/placeholder.svg?height=600&width=1000",
+    image: "/gamethub.webp",
     category: "Action",
     href: `/games/${params.id}`,
   }
 
-  // Replace the static recommendedGames array with this dynamic one
   const recommendedGames = [
     {
       id: "galactic-conquest",
       title: "Galactic Conquest",
-      image: "/placeholder.svg?height=200&width=350",
+      image: "/gamethub.webp",
       href: "/games/galactic-conquest",
       category: "Action",
       rating: 4.3,
@@ -57,7 +56,7 @@ export default function GamePage({ params }: GamePageProps) {
     {
       id: "starfall-arena",
       title: "Starfall Arena",
-      image: "/placeholder.svg?height=200&width=350",
+      image: "/gamethub.webp",
       href: "/games/starfall-arena",
       category: "Multiplayer",
       rating: 4.5,
@@ -67,7 +66,7 @@ export default function GamePage({ params }: GamePageProps) {
     {
       id: "nebula-wars",
       title: "Nebula Wars",
-      image: "/placeholder.svg?height=200&width=350",
+      image: "/gamethub.webp",
       href: "/games/nebula-wars",
       category: "Shooter",
       rating: 4.2,
@@ -106,15 +105,13 @@ export default function GamePage({ params }: GamePageProps) {
     },
   ]
 
-  // Filter recommended games based on current game's tags and category
   const getRecommendedGames = (
     currentGame: typeof game,
     allGames: typeof recommendedGames
   ) => {
     return allGames
-      .filter((g) => g.id !== currentGame.id) // Exclude current game
+      .filter((g) => g.id !== currentGame.id)
       .map((g) => {
-        // Calculate relevance score based on matching tags and category
         let score = 0
         if (g.category === currentGame.category) score += 3
         currentGame.tags.forEach((tag) => {
@@ -122,8 +119,8 @@ export default function GamePage({ params }: GamePageProps) {
         })
         return { ...g, relevanceScore: score }
       })
-      .sort((a, b) => b.relevanceScore - a.relevanceScore) // Sort by relevance
-      .slice(0, 5) // Take top 5
+      .sort((a, b) => b.relevanceScore - a.relevanceScore)
+      .slice(0, 5)
   }
 
   const filteredRecommendedGames = getRecommendedGames(game, recommendedGames)
@@ -144,12 +141,13 @@ export default function GamePage({ params }: GamePageProps) {
           </div>
         </div>
       </header>
+
       <main className="flex-1">
         <div className="container px-4 py-6">
           {/* Game Player Area */}
           <div className="mb-8">
             <div className="relative aspect-video w-full overflow-hidden rounded-lg bg-black">
-              <img src={game.image || "/placeholder.svg"} alt={game.title} className="h-full w-full object-cover" />
+              <img src={game.image} alt={game.title} className="h-full w-full object-cover" />
               <div className="absolute inset-0 flex items-center justify-center bg-black/20">
                 <Button size="lg" className="h-16 w-16 rounded-full bg-white/20 backdrop-blur-sm hover:bg-white/30">
                   <Play className="h-8 w-8 text-white" fill="white" />
@@ -166,7 +164,6 @@ export default function GamePage({ params }: GamePageProps) {
 
             {/* Rating Section */}
             <div className="mb-8 flex items-start gap-8">
-              {/* Rating Score and Stars */}
               <div className="flex items-center gap-4">
                 <div className="text-6xl font-bold">{game.rating}</div>
                 <div className="flex flex-col gap-2">
@@ -188,7 +185,6 @@ export default function GamePage({ params }: GamePageProps) {
                 </div>
               </div>
 
-              {/* Rating Distribution */}
               <div className="flex-1 space-y-2">
                 {game.ratingDistribution.map((rating) => (
                   <div key={rating.stars} className="flex items-center gap-3">
@@ -205,13 +201,11 @@ export default function GamePage({ params }: GamePageProps) {
               </div>
             </div>
 
-            {/* Action Buttons */}
             <div className="mb-8 flex items-center gap-4">
               <FavoriteButton game={game} />
               <Button variant="outline">Share Game</Button>
             </div>
 
-            {/* Tags Section */}
             <div className="mb-12">
               <h2 className="mb-4 text-xl font-bold">Tags</h2>
               <div className="flex flex-wrap gap-3">
@@ -227,7 +221,6 @@ export default function GamePage({ params }: GamePageProps) {
               </div>
             </div>
 
-            {/* Recommended Games Section */}
             <div>
               <h2 className="mb-6 text-2xl font-bold">Recommended Games</h2>
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
@@ -236,7 +229,7 @@ export default function GamePage({ params }: GamePageProps) {
                     <div className="relative overflow-hidden rounded-lg transition-transform duration-300 group-hover:scale-105">
                       <Link href={recommendedGame.href}>
                         <img
-                          src={recommendedGame.image || "/placeholder.svg"}
+                          src={recommendedGame.image}
                           alt={recommendedGame.title}
                           className="aspect-video w-full object-cover"
                         />
@@ -284,6 +277,7 @@ export default function GamePage({ params }: GamePageProps) {
           </div>
         </div>
       </main>
+
       <footer className="border-t py-6">
         <div className="container px-4 text-center text-sm text-muted-foreground">
           <p>© 2025 GameHub. All rights reserved.</p>
