@@ -37,11 +37,15 @@
     "@radix-ui/react-toggle": "1.1.1",
     "@radix-ui/react-toggle-group": "1.1.1",
     "@radix-ui/react-tooltip": "1.1.6",
+    "@react-three/drei": "^10.1.2",
+    "@react-three/fiber": "^9.1.2",
+    "@react-three/rapier": "^2.1.0",
     "@types/jsonwebtoken": "^9.0.9",
     "@types/mongodb": "^4.0.6",
     "autoprefixer": "^10.4.20",
     "bcrypt": "^6.0.0",
     "bcryptjs": "^3.0.2",
+    "cannon-es": "^0.20.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "1.0.4",
@@ -60,19 +64,21 @@
     "react-hook-form": "^7.54.1",
     "react-resizable-panels": "^2.1.7",
     "recharts": "2.15.0",
+    "socket.io-client": "^4.8.1",
     "sonner": "^1.7.1",
     "tailwind-merge": "^2.5.5",
     "tailwindcss-animate": "^1.0.7",
+    "three": "^0.177.0",
     "vaul": "^0.9.6",
     "zod": "^3.24.1"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
-    "@types/node": "^22",
-    "@types/react": "^19",
+    "@types/node": "^22.15.31",
+    "@types/react": "^19.1.7",
     "@types/react-dom": "^19",
     "postcss": "^8.5",
     "tailwindcss": "^3.4.17",
-    "typescript": "^5"
+    "typescript": "^5.8.3"
   }
 }
