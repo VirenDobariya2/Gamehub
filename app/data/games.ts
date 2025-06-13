@@ -47,7 +47,7 @@ export const games: readonly Game[] = [
     id: "count-masters-stickman-games",
     title: "Count Masters – Stickman Clash",
     description: "Grow your stick army and storm the castle!",
-    image: "/thumb/ .jpg",
+    image: "/thumb/count-masters.jpg",
     tags: ["runner", "math", "casual"],
     category: "Casual",
     embedWrapper: "CountMastersWrapper",
