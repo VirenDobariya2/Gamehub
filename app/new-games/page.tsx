@@ -1,29 +1,27 @@
-import Link from "next/link"
-import type { Metadata } from "next"
-import { MainNav } from "@/components/main-nav"
-import { UserNav } from "@/components/user-nav"
-import { SearchBar } from "@/components/search-bar"
-import { GameCard } from "@/components/game-card"
-import { Badge } from "@/components/ui/badge"
+// app/games/new/page.tsx
 
-export const metadata: Metadata = {
-  title: "New Games - GameHub",
-  description: "Discover the latest games added to GameHub. Play new and exciting games for free.",
-}
+"use client";
+
+import Link from "next/link";
+import { useState } from "react";
+import { MainNav } from "@/components/main-nav";
+import { UserNav } from "@/components/user-nav";
+import { SearchBar } from "@/components/search-bar";
+import { Badge } from "@/components/ui/badge";
+import { games } from "@/app/data/games";
+import GameRenderer from "../games/_clients/GameRenderer";
+
 
 export default function NewGamesPage() {
-  // In a real app, you would fetch new games from your database
-  const newGames = Array.from({ length: 24 }).map((_, i) => ({
-    id: `new-game-${i + 1}`,
-    title: `New Game ${i + 1}`,
-    image: `/placeholder.svg?height=200&width=350`,
-    href: `/games/new-game-${i + 1}`,
-    addedDate: new Date(Date.now() - i * 24 * 60 * 60 * 1000).toLocaleDateString(),
-    category: ["Action", "Adventure", "Puzzle", "Strategy", "Sports", "Racing"][i % 6],
-    isNew: i < 6,
-  }))
+  const newGames = games.filter((game) => game.isNew);
 
-  const sortOptions = ["Newest First", "Oldest First", "Most Popular", "Highest Rated"]
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredGames = newGames.filter((game) =>
+    game.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const sortOptions = ["Newest First", "Oldest First", "Most Popular", "Highest Rated"];
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -36,11 +34,12 @@ export default function NewGamesPage() {
             <MainNav />
           </div>
           <div className="flex items-center gap-4">
-            <SearchBar />
+            <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
             <UserNav />
           </div>
         </div>
       </header>
+
       <main className="flex-1">
         <div className="container px-4 py-6">
           <div className="mb-6 flex items-center justify-between">
@@ -60,27 +59,39 @@ export default function NewGamesPage() {
             </div>
           </div>
 
-          <div className="game-grid">
-            {newGames.map((game) => (
-              <div key={game.id} className="relative">
-                {game.isNew && (
-                  <Badge className="absolute left-2 top-2 z-10 bg-primary text-primary-foreground">NEW</Badge>
-                )}
-                <GameCard id={game.id} title={game.title} image={game.image} href={game.href} />
-                <div className="mt-1 flex items-center justify-between text-xs text-muted-foreground">
-                  <span>{game.category}</span>
-                  <span>{game.addedDate}</span>
+          {filteredGames.length > 0 ? (
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+              {filteredGames.map((game) => (
+                <div key={game.id} className="relative">
+                  {game.isNew && (
+                    <Badge className="absolute left-2 top-2 z-10 bg-primary text-primary-foreground">
+                      NEW
+                    </Badge>
+                  )}
+                  <GameRenderer
+                    id={game.id}
+                    title={game.title}
+                    image={game.image}
+                    video={game.video || ""}
+                  />
+                  <div className="mt-1 flex items-center justify-between text-xs text-muted-foreground">
+                    <span>{game.category}</span>
+                    {/* <span>{game.addedDate}</span> */}
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-muted-foreground">No games found.</p>
+          )}
         </div>
       </main>
+
       <footer className="border-t py-6">
         <div className="container px-4 text-center text-sm text-muted-foreground">
           <p>© 2025 GameHub. All rights reserved.</p>
         </div>
       </footer>
     </div>
-  )
+  );
 }

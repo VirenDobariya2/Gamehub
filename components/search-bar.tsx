@@ -1,29 +1,22 @@
-"use client"
+"use client";
 
-import type React from "react"
+import React, { useState } from "react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Search, X } from "lucide-react";
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { Search, X } from "lucide-react"
+interface SearchBarProps {
+  searchQuery: string;
+  setSearchQuery: (value: string) => void;
+}
 
-export function SearchBar() {
-  const [searchQuery, setSearchQuery] = useState("")
-  const [isExpanded, setIsExpanded] = useState(false)
-  const router = useRouter()
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (searchQuery.trim()) {
-      router.push(`/search?q=${encodeURIComponent(searchQuery)}`)
-    }
-  }
+export function SearchBar({ searchQuery, setSearchQuery }: SearchBarProps) {
+  const [isExpanded, setIsExpanded] = useState(false);
 
   return (
     <div className="relative">
       {isExpanded ? (
-        <form onSubmit={handleSearch} className="flex items-center">
+        <div className="flex items-center">
           <Input
             type="search"
             placeholder="Search for games"
@@ -37,12 +30,15 @@ export function SearchBar() {
             size="icon"
             className="absolute right-0"
             type="button"
-            onClick={() => setIsExpanded(false)}
+            onClick={() => {
+              setIsExpanded(false);
+              setSearchQuery("");
+            }}
           >
             <X className="h-4 w-4" />
             <span className="sr-only">Close search</span>
           </Button>
-        </form>
+        </div>
       ) : (
         <Button variant="ghost" size="icon" onClick={() => setIsExpanded(true)}>
           <Search className="h-5 w-5" />
@@ -50,5 +46,5 @@ export function SearchBar() {
         </Button>
       )}
     </div>
-  )
+  );
 }

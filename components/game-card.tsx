@@ -8,7 +8,7 @@ interface GameCardProps {
   id: string
   title: string
   image: string
-  href: string
+ 
   className?: string
   showFavoriteButton?: boolean
   category?: string
@@ -19,7 +19,7 @@ export function GameCard({
   id,
   title,
   image,
-  href,
+  
   className,
   showFavoriteButton = false,
   category = "Action",
@@ -29,7 +29,7 @@ export function GameCard({
     id,
     title,
     image,
-    href,
+    
     category,
     rating,
   }
@@ -37,9 +37,9 @@ export function GameCard({
   return (
     <div className={cn("game-card group", className)}>
       <div className="relative overflow-hidden rounded-lg">
-        <Link href={href}>
+        <Link href={`/games/${id}`}>
           <img
-            src={image || "/gamethub.webp"}
+            src={image}
             alt={title}
             className="game-card-image transition-transform duration-300 hover:scale-105"
           />
@@ -52,7 +52,7 @@ export function GameCard({
           />
         )}
       </div>
-      <Link href={href}>
+      <Link href={`/games/${id}`}>
         <h3 className="game-card-title hover:text-primary">{title}</h3>
       </Link>
     </div>

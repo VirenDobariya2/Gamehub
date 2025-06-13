@@ -6,47 +6,10 @@ import { AdminSidebar } from "@/components/admin-sidebar"
 import { AdminHeader } from "@/components/admin-header"
 // import { AdminRouteGuard } from "@/components/admin-route-guard"
 import { Plus } from "lucide-react"
+import { games } from "@/app/data/games"
 
 export default function AdminGamesPage() {
   // Mock data - in real app, fetch from API
-  const games = [
-    {
-      id: "1",
-      title: "Space Explorers",
-      status: "published",
-      category: "Action",
-      createdAt: "2024-03-10",
-    },
-    {
-      id: "2",
-      title: "Puzzle Quest",
-      status: "draft",
-      category: "Puzzle",
-      createdAt: "2024-03-12",
-    },
-    {
-      id: "3",
-      title: "Racing Rivals",
-      status: "published",
-      category: "Racing",
-      createdAt: "2024-03-08",
-    },
-    {
-      id: "4",
-      title: "Strategy Masters",
-      status: "published",
-      category: "Strategy",
-      createdAt: "2024-03-05",
-    },
-    {
-      id: "5",
-      title: "Word Wizards",
-      status: "draft",
-      category: "Puzzle",
-      createdAt: "2024-03-14",
-    },
-  ]
-
   return (
  
       <div className="flex min-h-screen bg-background">

@@ -12,7 +12,7 @@ export default function SkyRidersWrapper() {
   return (
     <iframe
       ref={ref}
-      src="https://bloxd.io/game/bedwars_4v4v4v4?partyCode=CAR" 
+      src="/unity/sky-riders/index.html" 
       className="w-full h-full border-0 rounded-lg shadow-inner"
       allowFullScreen
       loading="lazy"

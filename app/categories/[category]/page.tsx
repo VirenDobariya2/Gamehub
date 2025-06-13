@@ -1,37 +1,23 @@
-import Link from "next/link"
-import type { Metadata } from "next"
-import { Button } from "@/components/ui/button"
-import { MainNav } from "@/components/main-nav"
-import { UserNav } from "@/components/user-nav"
-import { SearchBar } from "@/components/search-bar"
-import { GameCard } from "@/components/game-card"
+"use client";
 
-interface CategoryPageProps {
-  params: {
-    category: string
-  }
-}
+import Link from "next/link";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { MainNav } from "@/components/main-nav";
+import { UserNav } from "@/components/user-nav";
+import { SearchBar } from "@/components/search-bar";
+import GameRenderer from "@/app/games/_clients/GameRenderer";
+import { games } from "@/app/data/games";
 
-export function generateMetadata({ params }: CategoryPageProps): Metadata {
-  const category = params.category.charAt(0).toUpperCase() + params.category.slice(1)
-  return {
-    title: `${category} Games - GameHub`,
-    description: `Play the best ${params.category} games online for free on GameHub. Browse our collection of ${params.category} games.`,
-  }
-}
+export default function CategoryPageClient({ params }: { params: { category: string } }) {
+  const category = params.category.charAt(0).toUpperCase() + params.category.slice(1);
+  const [searchQuery, setSearchQuery] = useState("");
 
-export default function CategoryPage({ params }: CategoryPageProps) {
-  const category = params.category.charAt(0).toUpperCase() + params.category.slice(1)
+  const filteredGames = games.filter((game) =>
+    game.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
-  // In a real app, you would fetch games based on the category
-  const games = Array.from({ length: 12 }).map((_, i) => ({
-    id: `${params.category}-game-${i + 1}`,
-    title: `${category} Game ${i + 1}`,
-    image: `/placeholder.svg?height=200&width=350`,
-    href: `/games/${params.category}-game-${i + 1}`,
-  }))
-
-  const filters = ["All", category, "Driving", "Car", "Drifting", "Multiplayer"]
+  const filters = ["All", "Racing", "Driving", "Car", "Drifting", "Multiplayer"];
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -44,11 +30,12 @@ export default function CategoryPage({ params }: CategoryPageProps) {
             <MainNav />
           </div>
           <div className="flex items-center gap-4">
-            <SearchBar />
+            <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
             <UserNav />
           </div>
         </div>
       </header>
+
       <main className="flex-1">
         <div className="container px-4 py-6">
           <div className="mb-6">
@@ -56,29 +43,42 @@ export default function CategoryPage({ params }: CategoryPageProps) {
           </div>
 
           <div className="mb-6">
-            <div className="relative">
-              <div className="flex flex-wrap gap-2">
-                {filters.map((filter) => (
-                  <Button key={filter} variant={filter === category ? "default" : "secondary"} className="rounded-full">
-                    {filter}
-                  </Button>
-                ))}
-              </div>
+            <div className="flex flex-wrap gap-2">
+              {filters.map((filter) => (
+                <Button
+                  key={filter}
+                  variant={filter === category ? "default" : "secondary"}
+                  className="rounded-full"
+                >
+                  {filter}
+                </Button>
+              ))}
             </div>
           </div>
 
-          <div className="game-grid">
-            {games.map((game) => (
-              <GameCard key={game.id} id={game.id} title={game.title} image={game.image} href={game.href} />
-            ))}
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+            {filteredGames.length > 0 ? (
+              filteredGames.map((game) => (
+                <GameRenderer
+                  key={game.id}
+                  id={game.id}
+                  title={game.title}
+                  image={game.image}
+                  video={game.video ?? ""}
+                />
+              ))
+            ) : (
+              <p className="text-muted-foreground">No games found.</p>
+            )}
           </div>
         </div>
       </main>
+
       <footer className="border-t py-6">
         <div className="container px-4 text-center text-sm text-muted-foreground">
           <p>© 2025 GameHub. All rights reserved.</p>
         </div>
       </footer>
     </div>
-  )
+  );
 }

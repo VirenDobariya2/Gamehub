@@ -15,6 +15,10 @@ export interface Game {
   reviews: number;
   ratingDistribution: { stars: number; percentage: number }[];
   video?: string; 
+  status?: "published" | "draft"; // Optional status field
+  createdAt?: string; // Optional creation date
+  updatedAt?: string; // Optional last update date
+  isNew?: boolean;
 }
 // Convenience: a helper to generate a dummy rating distribution
 const makeDist = (five = 60, four = 25, three = 10, two = 3, one = 2): RatingBar[] => [
@@ -37,19 +41,20 @@ export const games: readonly Game[] = [
     rating: 4.6,
     reviews: 13820,
     ratingDistribution: makeDist(),
-    video: "/game.mp4", // Example video link
+    video: "/game.mp4",
   },
   {
     id: "count-masters-stickman-games",
     title: "Count Masters – Stickman Clash",
     description: "Grow your stick army and storm the castle!",
-    image: "/games/count-masters/thumb.jpg",
+    image: "/thumb/ .jpg",
     tags: ["runner", "math", "casual"],
     category: "Casual",
     embedWrapper: "CountMastersWrapper",
     rating: 4.2,
     reviews: 9876,
     ratingDistribution: makeDist(55, 28, 12, 3, 2),
+    isNew: true,  
   },
   {
     id: "stone-grass-mowing-simulator",

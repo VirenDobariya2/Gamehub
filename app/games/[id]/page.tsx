@@ -1,3 +1,6 @@
+"use client";
+
+import { use, useState } from "react";
 import { notFound } from "next/navigation";
 import Script from "next/script";
 import Link from "next/link";
@@ -10,16 +13,18 @@ import { FavoriteButton } from "@/components/favorite-button";
 import { Star, Play } from "lucide-react";
 
 import { games } from "@/app/data/games";
-import GameEmbedClient from "../_clients/GameEmbedClient";
+import SkyRidersWrapper from "../_embed/SkyRidersWrapper";
 
 interface GamePageProps {
-  params: {
-    id: string;
-  };
+  params: Promise<{ id: string }>;
 }
 
 export default function GamePage({ params }: GamePageProps) {
-  const game = games.find((g) => g.id === params.id);
+  const { id } = use(params);
+  const [isStarted, setIsStarted] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const game = games.find((g) => g.id === id);
   if (!game) return notFound();
 
   const recommended = games
@@ -42,8 +47,8 @@ export default function GamePage({ params }: GamePageProps) {
         src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX"
         crossOrigin="anonymous"
       />
+
       <div className="flex min-h-screen flex-col">
-        {/* Header */}
         <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur">
           <div className="container flex h-16 items-center justify-between px-4">
             <div className="flex items-center gap-6">
@@ -53,7 +58,7 @@ export default function GamePage({ params }: GamePageProps) {
               <MainNav />
             </div>
             <div className="flex items-center gap-4">
-              <SearchBar />
+             <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
               <UserNav />
             </div>
           </div>
@@ -61,31 +66,59 @@ export default function GamePage({ params }: GamePageProps) {
 
         <main className="container flex-1 px-4 py-6">
           <div className="flex flex-col gap-8 lg:flex-row">
-            {/* Game Embed */}
-            <div className="flex-1">
+            <div className="flex-1 relative">
               <div className="relative aspect-video w-full overflow-hidden rounded-lg bg-black">
-                <GameEmbedClient embedWrapper={game.embedWrapper} />
-              </div>
-
-              {/* Game Highlight Video */}
-              {game.video && (
-                <div className="mt-6">
-                  <h2 className="mb-2 text-xl font-bold">Game Highlight</h2>
-                  <div className="aspect-video overflow-hidden rounded-lg">
-                    <iframe
-                      className="h-full w-full"
-                      src={game.video}
-                      title="Game Highlight Video"
-                      frameBorder="0"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                    />
+                {!isStarted ? (
+                  <div className="relative w-full h-[600px] rounded-lg overflow-hidden">
+                    <video
+                      autoPlay
+                      muted
+                      loop
+                      playsInline
+                      className="absolute top-0 left-0 w-full h-full object-cover opacity-20 z-0"
+                    >
+                      <source src={game.video} type="video/mp4" />
+                    </video>
+                    <div className="relative z-10 flex flex-col items-center justify-center h-full text-center px-4">
+                      <img
+                        src={game.image}
+                        alt={game.title}
+                        className="w-64 h-40 object-cover rounded shadow-lg mb-6"
+                      />
+                      <h1 className="text-4xl font-bold text-white drop-shadow mb-4">
+                        {game.title}
+                      </h1>
+                      <Button
+                        onClick={() => setIsStarted(true)}
+                        className="bg-purple-600 hover:bg-purple-700 px-8 py-4 text-lg rounded-full text-white"
+                      >
+                        <Play className="mr-2" size={20} /> Play Now
+                      </Button>
+                    </div>
+                    <div className="absolute bottom-0 left-0 w-full bg-black/60 text-white px-4 py-3 flex justify-between items-center flex-wrap gap-3 z-10">
+                      <div className="flex items-center gap-2">
+                        <Button variant="ghost" size="sm">👍 Like</Button>
+                        <Button variant="ghost" size="sm">👎 Dislike</Button>
+                        <FavoriteButton game={game} className="text-white" variant="outline" />
+                        <Button variant="ghost" size="sm">💬 Feedback</Button>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Button variant="ghost" size="sm">🎮 Controls</Button>
+                        <Button variant="ghost" size="sm">📱 Mobile</Button>
+                        <Button variant="ghost" size="sm">⛶ Fullscreen</Button>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              )}
+                ) : (
+                  <div className="flex flex-col items-center justify-start">
+                    <div className="relative aspect-video w-full  rounded-lg overflow-hidden shadow-xl">
+                      <SkyRidersWrapper />
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
 
-            {/* Right Ad */}
             <aside className="mx-auto w-full max-w-xs lg:mx-0 lg:w-64">
               <div className="rounded bg-white p-4 shadow">
                 <h2 className="mb-2 text-lg font-semibold">Sponsored</h2>
@@ -98,10 +131,33 @@ export default function GamePage({ params }: GamePageProps) {
                   data-full-width-responsive="true"
                 />
               </div>
+
+              <div>
+                <h2 className="mb-4 text-lg font-bold">You may also like</h2>
+                <div className="grid grid-cols-2 gap-4">
+                  {recommended.map((rec) => (
+                    <Link
+                      key={rec.id}
+                      href={`/games/${rec.id}`}
+                      className="relative group overflow-hidden rounded-lg border bg-background shadow-sm hover:shadow-md transition"
+                    >
+                      <img
+                        src={rec.image}
+                        alt={rec.title}
+                        className="h-24 w-full object-cover group-hover:brightness-50 transition duration-300"
+                      />
+                      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                        <span className="text-white text-sm font-semibold bg-black/70 px-2 py-1 rounded">
+                          {rec.title}
+                        </span>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </div>
             </aside>
           </div>
 
-          {/* Game Info */}
           <section className="mt-10">
             <h1 className="mb-4 text-3xl font-bold">{game.title}</h1>
             <p className="mb-6 text-lg text-muted-foreground">{game.description}</p>
@@ -130,7 +186,6 @@ export default function GamePage({ params }: GamePageProps) {
                 </div>
               </div>
 
-              {/* Rating Distribution */}
               <div className="flex-1 space-y-2 min-w-[200px]">
                 {game.ratingDistribution.map((rd) => (
                   <div key={rd.stars} className="flex items-center gap-2">
@@ -150,7 +205,6 @@ export default function GamePage({ params }: GamePageProps) {
             </div>
 
             <div className="mb-8 flex items-center gap-4">
-              <FavoriteButton game={game} className="text-red-500"  variant="outline" />
               <Button variant="outline">Share Game</Button>
             </div>
 
@@ -170,43 +224,19 @@ export default function GamePage({ params }: GamePageProps) {
             </div>
           </section>
 
-          {/* Recommended */}
-          <section className="mt-10">
-            <h2 className="mb-4 text-xl font-bold">You may also like</h2>
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-              {recommended.map((rec) => (
-                <Link
-                  key={rec.id}
-                  href={`/games/${rec.id}`}
-                  className="overflow-hidden rounded-lg border bg-background shadow-sm transition hover:shadow-md"
-                >
-                  <img
-                    src={rec.image}
-                    alt={rec.title}
-                    className="h-36 w-full object-cover"
-                  />
-                  <div className="p-3">
-                    <p className="text-xs text-muted-foreground">{rec.category}</p>
-                    <p className="font-semibold">{rec.title}</p>
-                  </div>
-                </Link>
-              ))}
+          <aside className="mx-auto w-auto h-auto mt-8">
+            <div className="rounded bg-white p-4 shadow">
+              <h2 className="mb-2 text-lg font-semibold">Sponsored</h2>
+              <ins
+                className="adsbygoogle"
+                style={{ display: "block" }}
+                data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+                data-ad-slot="1234567890"
+                data-ad-format="auto"
+                data-full-width-responsive="true"
+              />
             </div>
-
-            <div className="mx-auto mt-8 max-w-2xl">
-              <div className="rounded bg-white p-4 shadow">
-                <h2 className="mb-2 text-lg font-semibold">Sponsored</h2>
-                <ins
-                  className="adsbygoogle"
-                  style={{ display: "block" }}
-                  data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
-                  data-ad-slot="1234567890"
-                  data-ad-format="auto"
-                  data-full-width-responsive="true"
-                />
-              </div>
-            </div>
-          </section>
+          </aside>
         </main>
 
         <footer className="border-t py-6">

@@ -1,7 +1,7 @@
 "use client"
 import dynamic from "next/dynamic"
 
-export default function GameEmbedClient({ embedWrapper }) {
+export default function GameEmbedClient({ embedWrapper }: { embedWrapper: string }) {
   const GameIframe = dynamic(() => import(`../_embed/${embedWrapper}`), {
     ssr: false,
     loading: () => <p className="p-8 text-white">Loading…</p>,

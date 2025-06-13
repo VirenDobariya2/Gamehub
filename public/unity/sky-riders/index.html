@@ -1,0 +1,641 @@
+<rosieArtifact title="Cosmic Burger Racer">
+<rosieCreate file="index.html">
+<![CDATA[
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cosmic Burger Racer</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #1a0033, #4a0080);
+        }
+        
+        #gameContainer {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+        }
+        
+        #ui {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: #FFD700;
+            font-size: 28px;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            z-index: 100;
+        }
+        
+        #instructions {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            color: #FFD700;
+            font-size: 16px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+            z-index: 100;
+        }
+    </style>
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://esm.sh/three@0.160.0?dev",
+                "three/": "https://esm.sh/three@0.160.0&dev/"
+            }
+        }
+    </script>
+</head>
+<body>
+    <div id="gameContainer">
+        <div id="ui">
+            <div>Score: <span id="score">0</span></div>
+        </div>
+        <div id="instructions">
+            WASD to race • Collect golden coins • Zoom through space!
+        </div>
+    </div>
+    
+    <script type="module" src="main.js"></script>
+    <script src="https://storage.googleapis.com/rosebud_staticfiles/ChatManager.js"></script>
+    <script src="https://storage.googleapis.com/rosebud_staticfiles/ImageGenerator.js"></script>
+    <script src="https://storage.googleapis.com/rosebud_staticfiles/ProgressLogger.js"></script>
+    <script src="https://storage.googleapis.com/rosebud_staticfiles/OGP.js"></script>
+</body>
+</html>
+]]>
+</rosieCreate>
+
+<rosieCreate file="main.js">
+<![CDATA[
+import * as THREE from 'three';
+import { PlayerController, ThirdPersonCameraController } from './rosieControls.js';
+import { HamburgerCar } from './hamburgerCar.js';
+import { SpaceTrack } from './spaceTrack.js';
+import { CollectibleManager } from './collectibles.js';
+import { GameUI } from './gameUI.js';
+
+class CosmicBurgerRacer {
+    constructor() {
+        this.score = 0;
+        this.init();
+    }
+
+    init() {
+        // Scene setup
+        this.scene = new THREE.Scene();
+        this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        
+        // Renderer with cosmic colors
+        this.renderer = new THREE.WebGLRenderer({ antialias: true });
+        this.renderer.setSize(window.innerWidth, window.innerHeight);
+        this.renderer.setClearColor(0x2a0040);
+        this.renderer.shadowMap.enabled = true;
+        this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        document.getElementById('gameContainer').appendChild(this.renderer.domElement);
+
+        // Create game objects
+        this.hamburgerCar = new HamburgerCar();
+        this.scene.add(this.hamburgerCar.mesh);
+
+        this.spaceTrack = new SpaceTrack();
+        this.scene.add(this.spaceTrack.mesh);
+
+        this.collectibleManager = new CollectibleManager(this.scene);
+        this.gameUI = new GameUI();
+
+        // Setup lighting
+        this.setupLighting();
+
+        // Initialize controls
+        this.playerController = new PlayerController(this.hamburgerCar.mesh, {
+            moveSpeed: 12,
+            jumpForce: 0, // No jumping in this racer
+            gravity: 0,   // No gravity
+            groundLevel: 0.5
+        });
+
+        this.cameraController = new ThirdPersonCameraController(
+            this.camera, 
+            this.hamburgerCar.mesh, 
+            this.renderer.domElement,
+            {
+                distance: 8,
+                height: 4,
+                rotationSpeed: 0.003
+            }
+        );
+
+        // Start game loop
+        this.clock = new THREE.Clock();
+        this.animate();
+
+        // Handle window resize
+        window.addEventListener('resize', () => this.onWindowResize());
+    }
+
+    setupLighting() {
+        // Ambient light for overall illumination
+        const ambientLight = new THREE.AmbientLight(0x4040ff, 0.4);
+        this.scene.add(ambientLight);
+
+        // Main directional light (cosmic sun)
+        const mainLight = new THREE.DirectionalLight(0xffd700, 1.2);
+        mainLight.position.set(10, 20, 10);
+        mainLight.castShadow = true;
+        mainLight.shadow.mapSize.width = 2048;
+        mainLight.shadow.mapSize.height = 2048;
+        this.scene.add(mainLight);
+
+        // Purple accent light
+        const purpleLight = new THREE.PointLight(0x8040ff, 0.8, 50);
+        purpleLight.position.set(-10, 5, -10);
+        this.scene.add(purpleLight);
+
+        // Pink accent light
+        const pinkLight = new THREE.PointLight(0xff4080, 0.6, 40);
+        pinkLight.position.set(10, 3, -5);
+        this.scene.add(pinkLight);
+    }
+
+    animate() {
+        requestAnimationFrame(() => this.animate());
+
+        const deltaTime = this.clock.getDelta();
+        
+        // Update player controls
+        const cameraRotation = this.cameraController.update();
+        this.playerController.update(deltaTime, cameraRotation);
+
+        // Update hamburger car
+        this.hamburgerCar.update(deltaTime);
+
+        // Update space track
+        this.spaceTrack.update(deltaTime);
+
+        // Check collectible collisions
+        const collectedCoins = this.collectibleManager.checkCollisions(this.hamburgerCar.mesh);
+        if (collectedCoins > 0) {
+            this.score += collectedCoins * 10;
+            this.gameUI.updateScore(this.score);
+        }
+
+        // Update collectibles
+        this.collectibleManager.update(deltaTime);
+
+        this.renderer.render(this.scene, this.camera);
+    }
+
+    onWindowResize() {
+        this.camera.aspect = window.innerWidth / window.innerHeight;
+        this.camera.updateProjectionMatrix();
+        this.renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+}
+
+// Start the game
+new CosmicBurgerRacer();
+]]>
+</rosieCreate>
+
+<rosieCreate file="hamburgerCar.js">
+<![CDATA[
+import * as THREE from 'three';
+
+export class HamburgerCar {
+    constructor() {
+        this.mesh = new THREE.Group();
+        this.wheels = [];
+        this.createHamburger();
+        this.wheelRotation = 0;
+    }
+
+    createHamburger() {
+        // Bottom bun
+        const bottomBunGeometry = new THREE.CylinderGeometry(1, 1.1, 0.3, 16);
+        const bottomBunMaterial = new THREE.MeshLambertMaterial({ color: 0xd2691e });
+        const bottomBun = new THREE.Mesh(bottomBunGeometry, bottomBunMaterial);
+        bottomBun.position.y = 0.15;
+        bottomBun.castShadow = true;
+        this.mesh.add(bottomBun);
+
+        // Lettuce
+        const lettuceGeometry = new THREE.CylinderGeometry(0.9, 0.9, 0.1, 16);
+        const lettuceMaterial = new THREE.MeshLambertMaterial({ color: 0x32cd32 });
+        const lettuce = new THREE.Mesh(lettuceGeometry, lettuceMaterial);
+        lettuce.position.y = 0.35;
+        lettuce.castShadow = true;
+        this.mesh.add(lettuce);
+
+        // Patty
+        const pattyGeometry = new THREE.CylinderGeometry(0.8, 0.8, 0.2, 16);
+        const pattyMaterial = new THREE.MeshLambertMaterial({ color: 0x8b4513 });
+        const patty = new THREE.Mesh(pattyGeometry, pattyMaterial);
+        patty.position.y = 0.5;
+        patty.castShadow = true;
+        this.mesh.add(patty);
+
+        // Cheese
+        const cheeseGeometry = new THREE.CylinderGeometry(0.85, 0.85, 0.05, 16);
+        const cheeseMaterial = new THREE.MeshLambertMaterial({ color: 0xffff00 });
+        const cheese = new THREE.Mesh(cheeseGeometry, cheeseMaterial);
+        cheese.position.y = 0.65;
+        cheese.castShadow = true;
+        this.mesh.add(cheese);
+
+        // Top bun
+        const topBunGeometry = new THREE.SphereGeometry(1, 16, 8, 0, Math.PI * 2, 0, Math.PI / 2);
+        const topBunMaterial = new THREE.MeshLambertMaterial({ color: 0xd2691e });
+        const topBun = new THREE.Mesh(topBunGeometry, topBunMaterial);
+        topBun.position.y = 1.2;
+        topBun.castShadow = true;
+        this.mesh.add(topBun);
+
+        // Sesame seeds on top bun
+        for (let i = 0; i < 6; i++) {
+            const seedGeometry = new THREE.SphereGeometry(0.03, 8, 6);
+            const seedMaterial = new THREE.MeshLambertMaterial({ color: 0xffeaa7 });
+            const seed = new THREE.Mesh(seedGeometry, seedMaterial);
+            
+            const angle = (i / 6) * Math.PI * 2;
+            seed.position.x = Math.cos(angle) * 0.4;
+            seed.position.z = Math.sin(angle) * 0.4;
+            seed.position.y = 1.4;
+            topBun.add(seed);
+        }
+
+        // Wheels
+        this.createWheels();
+    }
+
+    createWheels() {
+        const wheelPositions = [
+            { x: -0.8, z: 0.8 },   // Front left
+            { x: 0.8, z: 0.8 },    // Front right
+            { x: -0.8, z: -0.8 },  // Back left
+            { x: 0.8, z: -0.8 }    // Back right
+        ];
+
+        wheelPositions.forEach(pos => {
+            const wheelGroup = new THREE.Group();
+            
+            // Wheel
+            const wheelGeometry = new THREE.CylinderGeometry(0.25, 0.25, 0.15, 12);
+            const wheelMaterial = new THREE.MeshLambertMaterial({ color: 0x333333 });
+            const wheel = new THREE.Mesh(wheelGeometry, wheelMaterial);
+            wheel.rotation.z = Math.PI / 2;
+            wheel.castShadow = true;
+            wheelGroup.add(wheel);
+
+            // Rim
+            const rimGeometry = new THREE.CylinderGeometry(0.2, 0.2, 0.05, 12);
+            const rimMaterial = new THREE.MeshLambertMaterial({ color: 0xffd700 });
+            const rim = new THREE.Mesh(rimGeometry, rimMaterial);
+            rim.rotation.z = Math.PI / 2;
+            rim.position.x = 0.05;
+            wheelGroup.add(rim);
+
+            wheelGroup.position.set(pos.x, 0, pos.z);
+            this.mesh.add(wheelGroup);
+            this.wheels.push(wheelGroup);
+        });
+    }
+
+    update(deltaTime) {
+        // Rotate wheels based on movement
+        this.wheelRotation += deltaTime * 5;
+        this.wheels.forEach(wheel => {
+            wheel.rotation.x = this.wheelRotation;
+        });
+
+        // Add slight bounce animation
+        this.mesh.position.y = 0.5 + Math.sin(Date.now() * 0.005) * 0.05;
+    }
+}
+]]>
+</rosieCreate>
+
+<rosieCreate file="spaceTrack.js">
+<![CDATA[
+import * as THREE from 'three';
+
+export class SpaceTrack {
+    constructor() {
+        this.mesh = new THREE.Group();
+        this.planets = [];
+        this.stars = [];
+        this.createTrack();
+        this.createSpaceEnvironment();
+    }
+
+    createTrack() {
+        // Main track surface
+        const trackGeometry = new THREE.PlaneGeometry(400, 400, 32, 32);
+        const trackMaterial = new THREE.MeshLambertMaterial({ 
+            color: 0x1a0033,
+            transparent: true,
+            opacity: 0.8
+        });
+        const track = new THREE.Mesh(trackGeometry, trackMaterial);
+        track.rotation.x = -Math.PI / 2;
+        track.position.y = -0.1;
+        track.receiveShadow = true;
+        this.mesh.add(track);
+
+        // Racing stripes
+        this.createRacingStripes();
+        
+        // Track borders
+        this.createTrackBorders();
+    }
+
+    createRacingStripes() {
+        const colors = [0x8040ff, 0xff4080, 0x40ffff];
+        
+        for (let i = 0; i < 3; i++) {
+            const stripeGeometry = new THREE.PlaneGeometry(8, 400);
+            const stripeMaterial = new THREE.MeshLambertMaterial({ 
+                color: colors[i],
+                transparent: true,
+                opacity: 0.6
+            });
+            const stripe = new THREE.Mesh(stripeGeometry, stripeMaterial);
+            stripe.rotation.x = -Math.PI / 2;
+            stripe.position.set((i - 1) * 4, 0, 0);
+            this.mesh.add(stripe);
+        }
+
+        // Center line dashes
+        for (let z = -200; z < 200; z += 10) {
+            const dashGeometry = new THREE.PlaneGeometry(0.5, 4);
+            const dashMaterial = new THREE.MeshLambertMaterial({ color: 0xffd700 });
+            const dash = new THREE.Mesh(dashGeometry, dashMaterial);
+            dash.rotation.x = -Math.PI / 2;
+            dash.position.set(0, 0.01, z);
+            this.mesh.add(dash);
+        }
+    }
+
+    createTrackBorders() {
+        // Left and right barriers
+        for (let side of [-15, 15]) {
+            for (let z = -200; z < 200; z += 20) {
+                const barrierGeometry = new THREE.BoxGeometry(2, 1, 8);
+                const barrierMaterial = new THREE.MeshLambertMaterial({ 
+                    color: side < 0 ? 0xff4080 : 0x8040ff 
+                });
+                const barrier = new THREE.Mesh(barrierGeometry, barrierMaterial);
+                barrier.position.set(side, 0.5, z);
+                barrier.castShadow = true;
+                this.mesh.add(barrier);
+            }
+        }
+    }
+
+    createSpaceEnvironment() {
+        // Large planets in the background
+        this.createPlanet(new THREE.Vector3(-80, 15, -100), 8, 0xff6b6b, true);
+        this.createPlanet(new THREE.Vector3(120, 25, -150), 12, 0x4ecdc4, false);
+        this.createPlanet(new THREE.Vector3(-100, 20, 100), 6, 0xffd93d, false);
+        
+        // Floating space debris/asteroids
+        for (let i = 0; i < 20; i++) {
+            this.createAsteroid();
+        }
+
+        // Starfield
+        this.createStars();
+    }
+
+    createPlanet(position, radius, color, hasRings) {
+        const planetGroup = new THREE.Group();
+        
+        // Planet sphere
+        const planetGeometry = new THREE.SphereGeometry(radius, 32, 32);
+        const planetMaterial = new THREE.MeshLambertMaterial({ color: color });
+        const planet = new THREE.Mesh(planetGeometry, planetMaterial);
+        planetGroup.add(planet);
+
+        // Rings if specified
+        if (hasRings) {
+            const ringGeometry = new THREE.RingGeometry(radius * 1.3, radius * 1.8, 32);
+            const ringMaterial = new THREE.MeshLambertMaterial({ 
+                color: 0xffd700,
+                transparent: true,
+                opacity: 0.6,
+                side: THREE.DoubleSide
+            });
+            const rings = new THREE.Mesh(ringGeometry, ringMaterial);
+            rings.rotation.x = Math.PI / 2 + 0.3;
+            planetGroup.add(rings);
+        }
+
+        planetGroup.position.copy(position);
+        this.mesh.add(planetGroup);
+        this.planets.push(planetGroup);
+    }
+
+    createAsteroid() {
+        const asteroidGeometry = new THREE.DodecahedronGeometry(Math.random() * 2 + 0.5, 0);
+        const asteroidMaterial = new THREE.MeshLambertMaterial({ color: 0x666666 });
+        const asteroid = new THREE.Mesh(asteroidGeometry, asteroidMaterial);
+        
+        asteroid.position.set(
+            (Math.random() - 0.5) * 200,
+            Math.random() * 30 + 10,
+            (Math.random() - 0.5) * 400
+        );
+        
+        asteroid.rotation.set(
+            Math.random() * Math.PI,
+            Math.random() * Math.PI,
+            Math.random() * Math.PI
+        );
+        
+        this.mesh.add(asteroid);
+    }
+
+    createStars() {
+        const starGeometry = new THREE.BufferGeometry();
+        const starCount = 1000;
+        const positions = new Float32Array(starCount * 3);
+
+        for (let i = 0; i < starCount; i++) {
+            positions[i * 3] = (Math.random() - 0.5) * 1000;
+            positions[i * 3 + 1] = Math.random() * 200 + 50;
+            positions[i * 3 + 2] = (Math.random() - 0.5) * 1000;
+        }
+
+        starGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+        const starMaterial = new THREE.PointsMaterial({
+            color: 0xffffff,
+            size: 2,
+            transparent: true,
+            opacity: 0.8
+        });
+
+        const stars = new THREE.Points(starGeometry, starMaterial);
+        this.mesh.add(stars);
+        this.stars.push(stars);
+    }
+
+    update(deltaTime) {
+        // Rotate planets slowly
+        this.planets.forEach((planet, index) => {
+            planet.rotation.y += deltaTime * (0.2 + index * 0.1);
+            if (planet.children[1]) { // If it has rings
+                planet.children[1].rotation.z += deltaTime * 0.5;
+            }
+        });
+
+        // Twinkle stars
+        this.stars.forEach(starField => {
+            starField.material.opacity = 0.5 + Math.sin(Date.now() * 0.001) * 0.3;
+        });
+    }
+}
+]]>
+</rosieCreate>
+
+<rosieCreate file="collectibles.js">
+<![CDATA[
+import * as THREE from 'three';
+
+export class CollectibleManager {
+    constructor(scene) {
+        this.scene = scene;
+        this.coins = [];
+        this.coinGeometry = new THREE.CylinderGeometry(0.4, 0.4, 0.1, 12);
+        this.coinMaterial = new THREE.MeshLambertMaterial({ color: 0xffd700 });
+        
+        this.spawnCoins();
+    }
+
+    spawnCoins() {
+        // Create coins along the track
+        for (let z = -180; z < 180; z += 15) {
+            for (let x = -8; x <= 8; x += 8) {
+                if (Math.random() > 0.3) { // Don't spawn every coin
+                    this.createCoin(x + (Math.random() - 0.5) * 4, z);
+                }
+            }
+        }
+    }
+
+    createCoin(x, z) {
+        const coin = new THREE.Mesh(this.coinGeometry, this.coinMaterial);
+        coin.position.set(x, 1.5, z);
+        coin.castShadow = true;
+        coin.userData = { 
+            collected: false,
+            originalY: 1.5,
+            floatOffset: Math.random() * Math.PI * 2
+        };
+        
+        this.scene.add(coin);
+        this.coins.push(coin);
+    }
+
+    checkCollisions(player) {
+        let collectedCount = 0;
+        const playerPos = player.position;
+        
+        this.coins.forEach(coin => {
+            if (!coin.userData.collected) {
+                const distance = playerPos.distanceTo(coin.position);
+                if (distance < 2) {
+                    // Collect the coin
+                    coin.userData.collected = true;
+                    collectedCount++;
+                    
+                    // Animate collection
+                    this.animateCoinCollection(coin);
+                }
+            }
+        });
+        
+        return collectedCount;
+    }
+
+    animateCoinCollection(coin) {
+        // Quick scale and fade animation
+        const startScale = coin.scale.x;
+        const startTime = Date.now();
+        
+        const animate = () => {
+            const elapsed = Date.now() - startTime;
+            const progress = elapsed / 500; // 500ms animation
+            
+            if (progress < 1) {
+                const scale = startScale + (2 - startScale) * progress;
+                coin.scale.set(scale, scale, scale);
+                coin.material.opacity = 1 - progress;
+                coin.position.y += 0.1;
+                
+                requestAnimationFrame(animate);
+            } else {
+                // Remove from scene
+                this.scene.remove(coin);
+                const index = this.coins.indexOf(coin);
+                if (index > -1) {
+                    this.coins.splice(index, 1);
+                }
+            }
+        };
+        
+        animate();
+    }
+
+    update(deltaTime) {
+        // Animate coins - floating and rotating
+        this.coins.forEach(coin => {
+            if (!coin.userData.collected) {
+                // Rotate coins
+                coin.rotation.y += deltaTime * 3;
+                
+                // Float up and down
+                coin.userData.floatOffset += deltaTime * 2;
+                coin.position.y = coin.userData.originalY + Math.sin(coin.userData.floatOffset) * 0.3;
+            }
+        });
+    }
+}
+]]>
+</rosieCreate>
+
+<rosieCreate file="gameUI.js">
+<![CDATA[
+export class GameUI {
+    constructor() {
+        this.scoreElement = document.getElementById('score');
+        this.currentScore = 0;
+    }
+
+    updateScore(newScore) {
+        this.currentScore = newScore;
+        this.scoreElement.textContent = newScore.toString();
+        
+        // Add a brief highlight effect when score increases
+        this.scoreElement.style.transform = 'scale(1.2)';
+        this.scoreElement.style.color = '#FFD700';
+        
+        setTimeout(() => {
+            this.scoreElement.style.transform = 'scale(1)';
+            this.scoreElement.style.color = '#FFD700';
+        }, 200);
+    }
+
+    getScore() {
+        return this.currentScore;
+    }
+}
+]]>
+</rosieCreate>
+</rosieArtifact>
