@@ -1,19 +1,17 @@
 "use client";
 
-import { use, useState } from "react";
+import { use, useEffect, useRef, useState } from "react";
 import { notFound } from "next/navigation";
 import Script from "next/script";
 import Link from "next/link";
-
 import { Button } from "@/components/ui/button";
 import { MainNav } from "@/components/main-nav";
 import { UserNav } from "@/components/user-nav";
 import { SearchBar } from "@/components/search-bar";
 import { FavoriteButton } from "@/components/favorite-button";
 import { Star, Play } from "lucide-react";
-
 import { games } from "@/app/data/games";
-import SkyRidersWrapper from "../_embed/SkyRidersWrapper";
+import GameEmbedClient from "../_clients/GameEmbedClient";
 
 interface GamePageProps {
   params: Promise<{ id: string }>;
@@ -23,9 +21,70 @@ export default function GamePage({ params }: GamePageProps) {
   const { id } = use(params);
   const [isStarted, setIsStarted] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [likes, setLikes] = useState(0);
+  const [dislikes, setDislikes] = useState(0);
+  const [hasLiked, setHasLiked] = useState(false);
+  const [hasDisliked, setHasDisliked] = useState(false);
+  const [userReaction, setUserReaction] = useState<"like" | "dislike" | null>(null);
 
   const game = games.find((g) => g.id === id);
   if (!game) return notFound();
+
+  const gameFrameRef = useRef<HTMLDivElement>(null);
+
+   useEffect(() => {
+    const stored = localStorage.getItem(`reaction-${id}`);
+    if (stored === "like" || stored === "dislike") {
+      setUserReaction(stored);
+    }
+  }, [id]);
+
+  useEffect(() => {
+    if (userReaction) {
+      localStorage.setItem(`reaction-${id}`, userReaction);
+    } else {
+      localStorage.removeItem(`reaction-${id}`);
+    }
+  }, [userReaction, id]);
+
+  const handleLike = () => {
+    if (userReaction === "like") {
+      // Remove like
+      setLikes((prev) => Math.max(prev - 1, 0));
+      setUserReaction(null);
+    } else {
+      if (userReaction === "dislike") {
+        setDislikes((prev) => Math.max(prev - 1, 0));
+      }
+      setLikes((prev) => prev + 1);
+      setUserReaction("like");
+    }
+  };
+
+  const handleDislike = () => {
+    if (userReaction === "dislike") {
+      // Remove dislike
+      setDislikes((prev) => Math.max(prev - 1, 0));
+      setUserReaction(null);
+    } else {
+      if (userReaction === "like") {
+        setLikes((prev) => Math.max(prev - 1, 0));
+      }
+      setDislikes((prev) => prev + 1);
+      setUserReaction("dislike");
+    }
+  };
+
+
+  const handleFullscreen = () => {
+    const el = gameFrameRef.current;
+    if (!el) return;
+    if (el.requestFullscreen) el.requestFullscreen();
+    else if ((el as any).webkitRequestFullscreen) (el as any).webkitRequestFullscreen();
+    else if ((el as any).mozRequestFullScreen) (el as any).mozRequestFullScreen();
+    else if ((el as any).msRequestFullscreen) (el as any).msRequestFullscreen();
+  };
+
 
   const recommended = games
     .filter((g) => g.id !== game.id)
@@ -58,7 +117,10 @@ export default function GamePage({ params }: GamePageProps) {
               <MainNav />
             </div>
             <div className="flex items-center gap-4">
-             <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+              <SearchBar
+                searchQuery={searchQuery}
+                setSearchQuery={setSearchQuery}
+              />
               <UserNav />
             </div>
           </div>
@@ -97,22 +159,56 @@ export default function GamePage({ params }: GamePageProps) {
                     </div>
                     <div className="absolute bottom-0 left-0 w-full bg-black/60 text-white px-4 py-3 flex justify-between items-center flex-wrap gap-3 z-10">
                       <div className="flex items-center gap-2">
-                        <Button variant="ghost" size="sm">👍 Like</Button>
-                        <Button variant="ghost" size="sm">👎 Dislike</Button>
-                        <FavoriteButton game={game} className="text-white" variant="outline" />
-                        <Button variant="ghost" size="sm">💬 Feedback</Button>
+                        <Button
+                          variant={userReaction === "like" ? "default" : "outline"}
+                          size="sm"
+                          onClick={handleLike}
+                        >
+                          👍 ({likes})
+                        </Button>
+                        <Button
+                          variant={userReaction === "dislike" ? "default" : "outline"}
+                          size="sm"
+                          onClick={handleDislike}
+                        >
+                          👎 ({dislikes})
+                        </Button>
+                        <FavoriteButton
+                          game={game}
+                          className="text-white"
+                          variant="outline"
+                        />
+                        <Button variant="ghost" size="sm">
+                          💬{" "}
+                        </Button>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Button variant="ghost" size="sm">🎮 Controls</Button>
-                        <Button variant="ghost" size="sm">📱 Mobile</Button>
-                        <Button variant="ghost" size="sm">⛶ Fullscreen</Button>
+                        <Button variant="ghost" size="sm">
+                          🎮
+                        </Button>
+                        <Button variant="ghost" size="sm">
+                          📱
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={handleFullscreen}
+                        >
+                          ⛶
+                        </Button>
                       </div>
                     </div>
                   </div>
                 ) : (
                   <div className="flex flex-col items-center justify-start">
-                    <div className="relative aspect-video w-full  rounded-lg overflow-hidden shadow-xl">
-                      <SkyRidersWrapper />
+                    <div
+                      ref={gameFrameRef}
+                      className="relative aspect-video w-full rounded-lg overflow-hidden shadow-xl"
+                    >
+                      <GameEmbedClient
+                        ref={gameFrameRef}
+                        embedWrapper={game.embedWrapper}
+                      />
                     </div>
                   </div>
                 )}
@@ -160,7 +256,9 @@ export default function GamePage({ params }: GamePageProps) {
 
           <section className="mt-10">
             <h1 className="mb-4 text-3xl font-bold">{game.title}</h1>
-            <p className="mb-6 text-lg text-muted-foreground">{game.description}</p>
+            <p className="mb-6 text-lg text-muted-foreground">
+              {game.description}
+            </p>
 
             <div className="mb-8 flex flex-wrap gap-8">
               <div className="flex items-center gap-4">
@@ -173,7 +271,8 @@ export default function GamePage({ params }: GamePageProps) {
                         className={`h-6 w-6 ${
                           star <= Math.floor(game.rating)
                             ? "fill-primary text-primary"
-                            : star === Math.ceil(game.rating) && game.rating % 1 !== 0
+                            : star === Math.ceil(game.rating) &&
+                              game.rating % 1 !== 0
                             ? "fill-primary/50 text-primary"
                             : "fill-none text-muted-foreground"
                         }`}

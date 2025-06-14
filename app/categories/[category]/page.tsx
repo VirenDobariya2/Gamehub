@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import React, { useState, use } from "react";
 import { Button } from "@/components/ui/button";
 import { MainNav } from "@/components/main-nav";
 import { UserNav } from "@/components/user-nav";
@@ -9,12 +9,15 @@ import { SearchBar } from "@/components/search-bar";
 import GameRenderer from "@/app/games/_clients/GameRenderer";
 import { games } from "@/app/data/games";
 
-export default function CategoryPageClient({ params }: { params: { category: string } }) {
-  const category = params.category.charAt(0).toUpperCase() + params.category.slice(1);
+export default function CategoryPageClient({ params }: { params: Promise<{ category: string }> }) {
+  const { category } = use(params);
+  const formattedCategory = category.charAt(0).toUpperCase() + category.slice(1);
   const [searchQuery, setSearchQuery] = useState("");
 
-  const filteredGames = games.filter((game) =>
-    game.title.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredGames = games.filter(
+    (game) =>
+      game.category.toLowerCase() === category.toLowerCase() &&
+      game.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const filters = ["All", "Racing", "Driving", "Car", "Drifting", "Multiplayer"];
@@ -39,7 +42,7 @@ export default function CategoryPageClient({ params }: { params: { category: str
       <main className="flex-1">
         <div className="container px-4 py-6">
           <div className="mb-6">
-            <h1 className="text-3xl font-bold">{category} Games</h1>
+            <h1 className="text-3xl font-bold">{formattedCategory} Games</h1>
           </div>
 
           <div className="mb-6">
@@ -47,7 +50,7 @@ export default function CategoryPageClient({ params }: { params: { category: str
               {filters.map((filter) => (
                 <Button
                   key={filter}
-                  variant={filter === category ? "default" : "secondary"}
+                  variant={filter === formattedCategory ? "default" : "secondary"}
                   className="rounded-full"
                 >
                   {filter}

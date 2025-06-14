@@ -103,7 +103,7 @@ export default function HomePage() {
                     key={game.id}
                     id={game.id}
                     title={game.title}
-                    image={game.thumbnail ?? game.image}
+                    image={game.image}
                     video={game.video}
                   />
                 ))
