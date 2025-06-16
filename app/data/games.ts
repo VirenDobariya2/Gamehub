@@ -3,6 +3,22 @@ export interface RatingBar {
   percentage: number;
 }
 
+export interface Control {
+  key: string;
+  action: string;
+}
+
+export interface FAQ {
+  question: string;
+  answer: string;
+}
+
+export interface SimilarGame {
+  id: string;
+  title: string;
+  image: string;
+}
+
 export interface Game {
   id: string;
   title: string;
@@ -12,36 +28,129 @@ export interface Game {
   tags: string[];
   embedWrapper: string;
   rating: number;
-  reviews: number;
-  ratingDistribution: { stars: number; percentage: number }[];
-  video?: string; 
-  status?: "published" | "draft"; // Optional status field
-  createdAt?: string; // Optional creation date
-  updatedAt?: string; // Optional last update date
+  reviews?: number;
+  technology?: string;
+  platforms?: string[];
+  video?: string;
+  moreGamesLikeThis?: {
+    title: string;
+    description: string;
+  }[];
+  categories?: { label: string; count: number }[];
+  status?: "published" | "draft";
+  createdAt?: string;
+  updatedAt?: string;
   isNew?: boolean;
+  developer?: string;
+  releaseDate?: string;
+  totalRatings?: number;
+  playerCount?: number;
+  controls?: Control[];
+  howToPlay?: string[];
+  features?: string[];
+  faq?: FAQ[];
+  similarGames?: SimilarGame[];
 }
-// Convenience: a helper to generate a dummy rating distribution
-const makeDist = (five = 60, four = 25, three = 10, two = 3, one = 2): RatingBar[] => [
-  { stars: 5, percentage: five },
-  { stars: 4, percentage: four },
-  { stars: 3, percentage: three },
-  { stars: 2, percentage: two },
-  { stars: 1, percentage: one },
-];
-
 export const games: readonly Game[] = [
   {
     id: "astray",
     title: "Astray",
-    description: "Soar between floating islands while dodging laser gates.",
-    image: "/gamethub.webp", 
-    tags: ["flying", "endless", "3d"],
-    category: "Arcade",
-    embedWrapper: "AstrayWrapper",
-    rating: 4.6,
-    reviews: 13820,
-    ratingDistribution: makeDist(),
+    description:
+      "Astray is a first-person motorcycle racing game developed by Soner Kara. Ride through endless highways, dodge traffic, and complete missions to unlock new bikes and upgrades.",
+    category: "Racing",
+    image: "/gamethub.webp",
     video: "/game.mp4",
+    embedWrapper: "AstrayWrapper",
+    developer: "SK Games",
+    releaseDate: "2023-09-15",
+    rating: 4.6,
+    technology: "HTML5 (Unity WebGL)",
+    totalRatings: 23812,
+    playerCount: 1120,
+    platforms: ["Browser (desktop, mobile, tablet)", "App Store(iOS, Android)"],
+    tags: ["Racing", "Motorbike", "3D", "Realistic", "Skill"],
+    categories: [
+      { label: "Driving", count: 307 },
+      { label: "Mobile", count: 728 },
+      { label: "3D", count: 1149 },
+      { label: "Simulation", count: 471 },
+      { label: "Bike", count: 67 },
+      { label: "Speed", count: 139 },
+      { label: "Mission", count: 181 },
+    ],
+    controls: [
+      { key: "Arrow Up", action: "Throttle" },
+      { key: "Arrow Down", action: "Brake" },
+      { key: "Arrow Left", action: "Steer Left" },
+      { key: "Arrow Right", action: "Steer Right" },
+      { key: "H", action: "Horn" },
+      { key: "Y", action: "Wheelie" },
+      { key: "T", action: "Look Left" },
+      { key: "U", action: "Look Right" },
+      { key: "R", action: "Gear Up" },
+      { key: "F", action: "Gear Down" },
+      { key: "P or F1", action: "Pause" },
+    ],
+    howToPlay: [
+      "Hit the road and weave through traffic at high speed.",
+      "Earn bonus points by overtaking cars above 100 km/h.",
+      "Use rewards to upgrade your bike or purchase new ones.",
+      "Navigate through Career, Endless, Time Trial, and Free Ride modes.",
+      "Ride in dynamic weather conditions and day-night cycles.",
+    ],
+    features: [
+      "First-person camera view",
+      "34 motorbikes to choose from",
+      "Real motor sounds recorded from real bikes",
+      "Detailed environments with day and night variations",
+      "Career mode with 90+ missions",
+    ],
+    moreGamesLikeThis: [
+      {
+        title: "Moto X3M",
+        description:
+          "a dirt bike game filled with difficult challenges and thrilling tracks.",
+      },
+      {
+        title: "Drift Hunters",
+        description:
+          "a 3D adventure featuring a wide selection of unique cars and dynamic racing tracks.",
+      },
+      {
+        title: "Mr Racer",
+        description:
+          "where you'll race through bustling areas at breakneck speeds.",
+      },
+    ],
+    faq: [
+      {
+        question: "Is Traffic Rider a multiplayer game?",
+        answer:
+          "Traffic Rider is a single-player first-person bike riding game.",
+      },
+      {
+        question: "Can I play Traffic Rider on PC?",
+        answer:
+          "Yes, Traffic Rider can be played online on desktop, mobile, or tablet.",
+      },
+    ],
+    similarGames: [
+      {
+        id: "highway-racer",
+        title: "Highway Racer",
+        image: "/games/highway-racer.jpg",
+      },
+      {
+        id: "bike-rush",
+        title: "Bike Rush",
+        image: "/games/bike-rush.jpg",
+      },
+      {
+        id: "moto-rider",
+        title: "Moto Rider",
+        image: "/games/moto-rider.jpg",
+      },
+    ],
   },
   {
     id: "the-aviator",
@@ -53,8 +162,8 @@ export const games: readonly Game[] = [
     embedWrapper: "TheAviatorWrapper",
     rating: 4.2,
     reviews: 9876,
-    ratingDistribution: makeDist(55, 28, 12, 3, 2),
-    isNew: true,  
+
+    isNew: true,
   },
   {
     id: "stack-game",
@@ -66,7 +175,6 @@ export const games: readonly Game[] = [
     embedWrapper: "StackGameWrapper",
     rating: 4.4,
     reviews: 7421,
-    ratingDistribution: makeDist(58, 26, 11, 3, 2),
   },
   {
     id: "italian-brainrot-clicker-usp",
@@ -78,19 +186,18 @@ export const games: readonly Game[] = [
     embedWrapper: "ItalianBrainrotWrapper",
     rating: 4.1,
     reviews: 6510,
-    ratingDistribution: makeDist(50, 30, 14, 4, 2),
   },
   {
     id: "solar-smash",
     title: "Solar Smash",
-    description: "Destroy planets with black‑holes & lasers. Stress relief 101.",
+    description:
+      "Destroy planets with black‑holes & lasers. Stress relief 101.",
     image: "/games/solar-smash/thumb.jpg",
     tags: ["sim", "destruction", "space"],
     category: "Simulation",
     embedWrapper: "SolarSmashWrapper",
     rating: 4.7,
     reviews: 18523,
-    ratingDistribution: makeDist(65, 23, 8, 2, 2),
   },
   {
     id: "endless-runner",
@@ -102,7 +209,6 @@ export const games: readonly Game[] = [
     embedWrapper: "EndlessRunnerWrapper",
     rating: 4.0,
     reviews: 4320,
-    ratingDistribution: makeDist(48, 29, 15, 5, 3),
   },
   {
     id: "zombie-defense",
@@ -114,7 +220,6 @@ export const games: readonly Game[] = [
     embedWrapper: "ZombieDefenseWrapper",
     rating: 4.3,
     reviews: 5920,
-    ratingDistribution: makeDist(56, 27, 11, 4, 2),
   },
   {
     id: "retro-racer",
@@ -126,7 +231,6 @@ export const games: readonly Game[] = [
     embedWrapper: "RetroRacerWrapper",
     rating: 4.5,
     reviews: 8211,
-    ratingDistribution: makeDist(62, 24, 10, 3, 1),
   },
   {
     id: "tower-merger",
@@ -138,7 +242,6 @@ export const games: readonly Game[] = [
     embedWrapper: "TowerMergerWrapper",
     rating: 4.2,
     reviews: 3780,
-    ratingDistribution: makeDist(54, 28, 12, 4, 2),
   },
   {
     id: "pixel-basket",
@@ -150,6 +253,5 @@ export const games: readonly Game[] = [
     embedWrapper: "PixelBasketWrapper",
     rating: 4.1,
     reviews: 2890,
-    ratingDistribution: makeDist(52, 29, 13, 4, 2),
   },
 ] as const;
