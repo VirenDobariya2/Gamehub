@@ -9,14 +9,17 @@ interface GameRendererProps {
   title: string;
   image: string;
   video?: string;
+  playerCount?: number; 
+  onPlay?: () => void;
 }
 
-export default function GameRenderer({ id, title, image, video }: GameRendererProps) {
+export default function GameRenderer({ id, title, image, video, onPlay }: GameRendererProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
   return (
     <Link
       href={`/games/${id}`}
+      onClick={onPlay}
       className="group rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-200"
       onMouseEnter={() => {
         if (videoRef.current) {
