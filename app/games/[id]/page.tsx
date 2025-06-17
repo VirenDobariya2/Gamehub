@@ -13,19 +13,17 @@ import { Star, Play } from "lucide-react";
 import { games } from "@/app/data/games";
 import GameEmbedClient from "../_clients/GameEmbedClient";
 
-interface GamePageProps {
-  params: Promise<{ id: string }>;
-}
-
-export default function GamePage({ params }: GamePageProps) {
+export default function GamePage({ params }) {
   const { id } = use(params);
   const [isStarted, setIsStarted] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [likes, setLikes] = useState(0);
   const [dislikes, setDislikes] = useState(0);
-  const [userReaction, setUserReaction] = useState<"like" | "dislike" | null>(
-    null
-  );
+  const [userReaction, setUserReaction] = useState<"like" | "dislike" | null>(null);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [showDislikeModal, setShowDislikeModal] = useState(false);
+  const [showLoginSidebar, setShowLoginSidebar] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false); 
   const game = games.find((g) => g.id === id);
   const gameFrameRef = useRef<HTMLDivElement>(null);
 
@@ -56,7 +54,6 @@ export default function GamePage({ params }: GamePageProps) {
       setUserReaction("like");
     }
   };
-
   const handleDislike = () => {
     if (userReaction === "dislike") {
       setDislikes((prev) => Math.max(prev - 1, 0));
@@ -70,16 +67,57 @@ export default function GamePage({ params }: GamePageProps) {
     }
   };
 
+  const handleDislikeClick = () => {
+    if (isLoggedIn) {
+      setShowDislikeModal(true); 
+    } else {
+      setShowLoginSidebar(true); 
+    }
+  };
+
+  const handleTellUsWhy = () => {
+    if (isLoggedIn) {
+      handleDislike(); // Only apply dislike after confirmation
+      setShowDislikeModal(false);
+      alert("Show feedback form or textarea");
+    } else {
+      setShowDislikeModal(false);
+      setShowLoginSidebar(true);
+    }
+  };
+
   const handleFullscreen = () => {
     const el = gameFrameRef.current;
+
     if (!el) return;
-    if (el.requestFullscreen) el.requestFullscreen();
-    else if ((el as any).webkitRequestFullscreen)
-      (el as any).webkitRequestFullscreen();
-    else if ((el as any).mozRequestFullScreen)
-      (el as any).mozRequestFullScreen();
-    else if ((el as any).msRequestFullscreen) (el as any).msRequestFullscreen();
+
+    if (!document.fullscreenElement) {
+      // Enter fullscreen
+      if (el.requestFullscreen) el.requestFullscreen();
+      else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+      else if (el.mozRequestFullScreen) el.mozRequestFullScreen();
+      else if (el.msRequestFullscreen) el.msRequestFullscreen();
+      setIsFullscreen(true);
+    } else {
+      // Exit fullscreen
+      if (document.exitFullscreen) document.exitFullscreen();
+      else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+      else if (document.mozCancelFullScreen) document.mozCancelFullScreen();
+      else if (document.msExitFullscreen) document.msExitFullscreen();
+      setIsFullscreen(false);
+    }
   };
+
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+
+    document.addEventListener("fullscreenchange", handleFullscreenChange);
+    return () => {
+      document.removeEventListener("fullscreenchange", handleFullscreenChange);
+    };
+  }, []);
 
   if (!game) return notFound();
 
@@ -159,45 +197,125 @@ export default function GamePage({ params }: GamePageProps) {
                         <Play className="mr-2" size={20} /> Play Now
                       </Button>
                     </div>
-                    <div className="absolute bottom-0 left-1/2 -translate-x-1/2 z-20 mb-4 flex flex-wrap justify-center gap-3 px-4 bg-black/60 backdrop-blur rounded-lg py-2">
-                      <Button
-                        variant={
-                          userReaction === "like" ? "default" : "outline"
-                        }
-                        size="sm"
-                        onClick={handleLike}
-                      >
-                        👍 ({likes})
-                      </Button>
-                      <Button
-                        variant={
-                          userReaction === "dislike" ? "default" : "outline"
-                        }
-                        size="sm"
-                        onClick={handleDislike}
-                      >
-                        👎 ({dislikes})
-                      </Button>
-                      <FavoriteButton
-                        game={game}
-                        variant="outline"
-                        className="text-white"
-                      />
-                      <Button variant="ghost" size="sm">
-                        💬
-                      </Button>
-                      <Button
-                        onClick={handleFullscreen}
-                        variant="ghost"
-                        size="sm"
-                      >
-                        ⛶
-                      </Button>
-                    </div>
                   </div>
                 ) : (
                   <GameEmbedClient embedWrapper={game.embedWrapper} />
                 )}
+                <div className="absolute bottom-0 left-0 right-0 z-20 bg-black/70 backdrop-blur-sm py-2 px-4 flex flex-wrap justify-between items-center">
+                  <div className="">
+                    <h1 className="text-xl sm:text-2xl font-bold text-white ">
+                      {game.title}
+                    </h1>
+                  </div>
+                  <div className="flex justify-center gap-3 text-center  text-sm">
+                    <div className="relative group inline-block">
+                      <div
+                        onClick={handleLike}
+                        title="Like"
+                        className={`flex cursor-pointer items-center gap-2 px-3 py-1 rounded-full border transition ${
+                          userReaction === "like"
+                            ? "bg-green-600 text-white"
+                            : "hover:bg-green-100 hover:text-green-700"
+                        }`}
+                      >
+                        👍 <span>{likes.toLocaleString()}</span>
+                      </div>
+                      <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity z-30">
+                        Like
+                      </span>
+                    </div>
+        <div>
+      {/* Dislike + Modal Section */}
+      <div className="relative inline-block group">
+        <div
+          onClick={handleDislikeClick}
+          title="Dislike"
+          className={`flex cursor-pointer items-center gap-2 px-3 py-1 rounded-full border transition ${
+            userReaction === "dislike"
+              ? "bg-red-600 text-white"
+              : "hover:bg-red-100 hover:text-red-700"
+          }`}
+        >
+          👎 {dislikes}
+        </div>
+
+        {/* Tooltip (Optional) */}
+        <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity z-30">
+          Dislike
+        </span>
+
+        {/* "Don't like this game?" Modal */}
+        {showDislikeModal && (
+          <div className="absolute bottom-full mb-12 left-1/2 -translate-x-1/2 w-64 bg-[#2c2c34] text-white p-4 rounded-xl shadow-lg z-50">
+            <div className="flex justify-between items-center mb-3">
+              <span className="text-sm font-medium">Don't like this game?</span>
+              <button
+                onClick={() => setShowDislikeModal(false)}
+                className="text-white text-sm"
+              >
+                ✕
+              </button>
+            </div>
+            <button
+              onClick={handleTellUsWhy}
+              className="w-full bg-[#8b5cf6] hover:bg-[#7c3aed] transition text-white py-2 rounded-full text-sm font-semibold"
+            >
+              Tell us why
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Simulate login sidebar */}
+      {showLoginSidebar && (
+        <div className="fixed top-0 right-0 w-[300px] h-full bg-white shadow-xl p-4 z-50">
+          <h2 className="text-xl font-bold mb-4">Login</h2>
+          <button
+            className="bg-blue-500 text-white px-4 py-2 rounded"
+            onClick={() => {
+              setIsLoggedIn(true);
+              setShowLoginSidebar(false);
+            }}
+          >
+            Simulate Login
+          </button>
+        </div>
+      )}
+    </div>
+            
+                    <FavoriteButton
+                      game={game}
+                      title="Favorite"
+                      variant="ghost"
+                      className="cursor-pointer items-center gap-2 px-3 py-1 rounded-full border transition"
+                    />
+
+<div className="relative group inline-block">
+                    <div
+                      className="cursor-pointer items-center gap-2 px-3 py-1 rounded-full border transition"
+                      title="Comment"
+                    >
+                      💬
+                    </div>
+                     <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity z-30">
+                        comment
+                      </span>
+                    
+</div>
+<div className="relative group inline-block">
+                    <div
+                      onClick={handleFullscreen}
+                      title="Fullscreen"
+                      className="cursor-pointer items-center gap-2 px-3 py-1 rounded-full border transition"
+                    >
+                      ⛶
+                    </div>
+                     <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity z-30">
+                        Full Screen
+                      </span>
+                      </div>
+                  </div>
+                </div>
               </div>
 
               {/* Game Info and Ads Below */}
@@ -237,21 +355,24 @@ export default function GamePage({ params }: GamePageProps) {
                         {game.category}
                       </Link>
                     </span>
-                   <span className="text-sm text-muted-foreground">
+                    <span className="text-sm text-muted-foreground">
                       Release Date:{" "}
                       {game.releaseDate
-                        ? new Date(game.releaseDate).toLocaleDateString("en-GB", {
-                            day: "2-digit",
-                            month: "2-digit",
-                            year: "numeric",
-                          })
+                        ? new Date(game.releaseDate).toLocaleDateString(
+                            "en-GB",
+                            {
+                              day: "2-digit",
+                              month: "2-digit",
+                              year: "numeric",
+                            }
+                          )
                         : "Unknown"}
                     </span>
-                    
+
                     <span className="text-sm text-muted-foreground">
                       Developer: {game.developer || "Unknown"}
-                    </span> 
-                   
+                    </span>
+
                     <span className="text-sm text-muted-foreground">
                       Technology:{game.technology || "Unknown"}
                     </span>
@@ -261,9 +382,9 @@ export default function GamePage({ params }: GamePageProps) {
                         ? game.platforms.join(", ")
                         : "Unknown"}
                     </span>
-                  </div>   
+                  </div>
                   <div className="flex flex-wrap gap-3">
-                      Tags:{" "}
+                    Tags:{" "}
                     {game.tags.map((tag) => (
                       <Link
                         key={tag}
@@ -272,76 +393,82 @@ export default function GamePage({ params }: GamePageProps) {
                       >
                         {tag}
                       </Link>
-                    ))}   
+                    ))}
                   </div>
-                  
-                  
-                <div className="mt-10">
-                  {game.description && (
-                    <section className="mb-6">
-                      <h2 className="text-xl font-semibold mb-2">Description</h2>
-                      <p className="text-sm text-muted-foreground">
-                        {game.description}
-                      </p>
-                    </section>
-                  )}
 
-                  {/* Game Details */}
-                  {Array.isArray(game.howToPlay) &&
-                    game.howToPlay.length > 0 && (
+                  <div className="mt-10">
+                    {game.description && (
                       <section className="mb-6">
                         <h2 className="text-xl font-semibold mb-2">
-                          How to Play
+                          Description
                         </h2>
-                        <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
-                          {game.howToPlay.map((step, i) => (
-                            <li key={i}>{step}</li>
-                          ))}
-                        </ul>
+                        <p className="text-sm text-muted-foreground">
+                          {game.description}
+                        </p>
                       </section>
                     )}
 
-                  {/* Controls */}
-                  {Array.isArray(game.controls) && game.controls.length > 0 && (
-                    <section className="mb-6">
-                      <h2 className="text-xl font-semibold mb-2">Controls</h2>
-                      <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
-                        {game.controls.map((ctrl, i) => (
-                          <li key={i}>
-                            <strong>{ctrl.key}</strong>: {ctrl.action}
-                          </li>
+                    {/* Game Details */}
+                    {Array.isArray(game.howToPlay) &&
+                      game.howToPlay.length > 0 && (
+                        <section className="mb-6">
+                          <h2 className="text-xl font-semibold mb-2">
+                            How to Play
+                          </h2>
+                          <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
+                            {game.howToPlay.map((step, i) => (
+                              <li key={i}>{step}</li>
+                            ))}
+                          </ul>
+                        </section>
+                      )}
+
+                    {/* Controls */}
+                    {Array.isArray(game.controls) &&
+                      game.controls.length > 0 && (
+                        <section className="mb-6">
+                          <h2 className="text-xl font-semibold mb-2">
+                            Controls
+                          </h2>
+                          <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
+                            {game.controls.map((ctrl, i) => (
+                              <li key={i}>
+                                <strong>{ctrl.key}</strong>: {ctrl.action}
+                              </li>
+                            ))}
+                          </ul>
+                        </section>
+                      )}
+
+                    {/* Features */}
+                    {Array.isArray(game.features) &&
+                      game.features.length > 0 && (
+                        <section className="mb-6">
+                          <h2 className="text-xl font-semibold mb-2">
+                            Features
+                          </h2>
+                          <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
+                            {game.features.map((feature, i) => (
+                              <li key={i}>{feature}</li>
+                            ))}
+                          </ul>
+                        </section>
+                      )}
+
+                    {/* FAQ */}
+                    {Array.isArray(game.faq) && game.faq.length > 0 && (
+                      <section>
+                        <h2 className="text-xl font-semibold mb-2">FAQs</h2>
+                        {game.faq.map((item, i) => (
+                          <div key={i} className="mb-2">
+                            <p className="font-medium">{item.question}</p>
+                            <p className="text-sm text-muted-foreground">
+                              {item.answer}
+                            </p>
+                          </div>
                         ))}
-                      </ul>
-                    </section>
-                  )}
-
-                  {/* Features */}
-                  {Array.isArray(game.features) && game.features.length > 0 && (
-                    <section className="mb-6">
-                      <h2 className="text-xl font-semibold mb-2">Features</h2>
-                      <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
-                        {game.features.map((feature, i) => (
-                          <li key={i}>{feature}</li>
-                        ))}
-                      </ul>
-                    </section>
-                  )}
-
-                  {/* FAQ */}
-                  {Array.isArray(game.faq) && game.faq.length > 0 && (
-                    <section>
-                      <h2 className="text-xl font-semibold mb-2">FAQs</h2>
-                      {game.faq.map((item, i) => (
-                        <div key={i} className="mb-2">
-                          <p className="font-medium">{item.question}</p>
-                          <p className="text-sm text-muted-foreground">
-                            {item.answer}
-                          </p>
-                        </div>
-                      ))}
-                    </section>
-                  )}
-
+                      </section>
+                    )}
                   </div>
                 </section>
 

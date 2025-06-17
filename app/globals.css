@@ -127,3 +127,8 @@
   width: 100vw;
   height: 100vh;
 }
+
+.tooltip::after {
+  content: attr(data-tooltip);
+  @apply absolute bottom-full left-1/2 -translate-x-1/2 bg-gray-800 text-white text-xs rounded px-2 py-1 mb-2 opacity-0 group-hover:opacity-100 transition-opacity;
+}

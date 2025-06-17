@@ -11,7 +11,7 @@ export default function AstrayWrapper() {
   return (
     <iframe
       ref={ref}
-      src="/astray/index.html"
+      src="/2048-master/index.html"
       className="w-full h-full border-0 rounded-lg shadow-inner"
       allowFullScreen
       loading="lazy"

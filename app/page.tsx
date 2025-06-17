@@ -18,21 +18,13 @@ const categories = [
   "Puzzle",
   "Strategy",
 ];
-interface Game {
-  id: string;
-  title: string;
-  image: string;
-  video?: string;
-  category: string;
-  tags?: string[];
-  playerCount?: number;
-}
+
 
 export default function HomePage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
-   const [recentGames, setRecentGames] = useState<Game[]>([]);
+   const [recentGames, setRecentGames] = useState([]);
 
   const allTags = Array.from(new Set(games.flatMap((game) => game.tags || [])));
 
@@ -43,9 +35,9 @@ export default function HomePage() {
     }
   }, []);
 
-  const handleRecentGame = (game: any) => {
+  const handleRecentGame = (game) => {
     const current = JSON.parse(localStorage.getItem("recentGames") || "[]");
-    const updated = [game, ...current.filter((g: any) => g.id !== game.id)].slice(0, 6);
+    const updated = [game, ...current.filter((g) => g.id !== game.id)].slice(0, 6);
     localStorage.setItem("recentGames", JSON.stringify(updated));
     setRecentGames(updated);
   };
@@ -90,7 +82,7 @@ export default function HomePage() {
               <h1 className="bg-gray-50 text-black font-2xl mx-w-20">Recent<span>game</span> : </h1>
               {recentGames.length > 0 && (
                 <div className="hidden lg:flex items-center gap-2">
-                  {recentGames.map((game: any) => (
+                  {recentGames.map((game) => (
                     <Link href={`/games/${game.id}`} key={game.id}>
                       <img
                         src={game.image}
@@ -224,7 +216,7 @@ export default function HomePage() {
               <section className="mt-8">
                 <h2 className="mb-3 text-xl font-semibold">Recently Played</h2>
                 <div className="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-6 gap-2">
-                  {recentGames.map((game: any) => (
+                  {recentGames.map((game) => (
                     <Link href={`/games/${game.id}`} key={game.id}>
                       <img
                         src={game.image}
