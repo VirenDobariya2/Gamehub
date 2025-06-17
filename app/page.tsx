@@ -9,6 +9,15 @@ import { SearchBar } from "@/components/search-bar";
 import { games } from "./data/games";
 import GameRenderer from "./games/_clients/GameRenderer";
 
+type Game = {
+  id: string;
+  title: string;
+  image: string;
+  category: string;
+  tags?: string[];
+  playerCount?: number;
+};
+
 const categories = [
   "All",
   "Racing",
@@ -19,30 +28,29 @@ const categories = [
   "Strategy",
 ];
 
-
 export default function HomePage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
-   const [recentGames, setRecentGames] = useState([]);
+  const [recentGames, setRecentGames] = useState<Game[]>([]);
 
   const allTags = Array.from(new Set(games.flatMap((game) => game.tags || [])));
 
   useEffect(() => {
     const stored = localStorage.getItem("recentGames");
     if (stored) {
-      setRecentGames(JSON.parse(stored));
+      setRecentGames(JSON.parse(stored) as Game[]);
     }
   }, []);
 
-  const handleRecentGame = (game) => {
-    const current = JSON.parse(localStorage.getItem("recentGames") || "[]");
+  const handleRecentGame = (game: Game) => {
+    const current = JSON.parse(localStorage.getItem("recentGames") || "[]") as Game[];
     const updated = [game, ...current.filter((g) => g.id !== game.id)].slice(0, 6);
     localStorage.setItem("recentGames", JSON.stringify(updated));
     setRecentGames(updated);
   };
 
-  const filteredGames = games.filter((game) => {
+  const filteredGames = games.filter((game: Game) => {
     const matchesSearch = game.title.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory = selectedCategory === "All" || game.category === selectedCategory;
     const matchesTag = !selectedTag || game.tags?.includes(selectedTag);
@@ -70,7 +78,6 @@ export default function HomePage() {
             <div className="flex items-center gap-4">
               <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
               <UserNav />
-              
             </div>
           </div>
         </header>
@@ -79,7 +86,9 @@ export default function HomePage() {
         <main className="flex-1">
           <section className="container px-4 py-6">
             <div className="mb-8 flex flex-row gap-5">
-              <h1 className="bg-gray-50 text-black font-2xl mx-w-20">Recent<span>game</span> : </h1>
+              <h1 className="bg-gray-50 text-black font-2xl mx-w-20">
+                Recent<span> game</span>:
+              </h1>
               {recentGames.length > 0 && (
                 <div className="hidden lg:flex items-center gap-2">
                   {recentGames.map((game) => (
@@ -94,8 +103,8 @@ export default function HomePage() {
                   ))}
                 </div>
               )}
-              </div>
-            
+            </div>
+
             {/* Hero Section */}
             <div className="mb-10 flex flex-col lg:flex-row gap-6">
               <div className="relative w-full lg:w-3/4 overflow-hidden rounded-lg">
@@ -183,10 +192,13 @@ export default function HomePage() {
                 {selectedTag ? `Recommended - "${selectedTag}"` : "Top Recommendations"}
               </h2>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
-                {(selectedTag ? games.filter((g) => g.tags?.includes(selectedTag)) : games)
+                {(selectedTag ? games.filter((g: Game) => g.tags?.includes(selectedTag)) : games)
                   .slice(0, 3)
                   .map((game) => (
-                    <div key={game.id} className="rounded-lg bg-muted p-3 hover:shadow-lg transition">
+                    <div
+                      key={game.id}
+                      className="rounded-lg bg-muted p-3 hover:shadow-lg transition"
+                    >
                       <img src={game.image} alt={game.title} className="rounded mb-2" />
                       <h3 className="text-lg font-semibold">{game.title}</h3>
                       <p className="text-sm text-muted-foreground">
@@ -211,7 +223,7 @@ export default function HomePage() {
               </div>
             </section>
 
-            {/* Recent Games Sidebar */}
+            {/* Recently Played */}
             {recentGames.length > 0 && (
               <section className="mt-8">
                 <h2 className="mb-3 text-xl font-semibold">Recently Played</h2>

@@ -14,6 +14,8 @@ type TimeFilter = "Today" | "This Week" | "This Month" | "All Time"
 
 export default function TrendingPage() {
   const [activeFilter, setActiveFilter] = useState<TimeFilter>("Today")
+  const [isStarted, setIsStarted] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   // Mock data for different time periods
   const gamesByPeriod = {
@@ -73,7 +75,10 @@ export default function TrendingPage() {
             <MainNav />
           </div>
           <div className="flex items-center gap-4">
-            <SearchBar />
+            <SearchBar
+                searchQuery={searchQuery}
+                setSearchQuery={setSearchQuery}
+              />
             <UserNav />
           </div>
         </div>
@@ -117,7 +122,7 @@ export default function TrendingPage() {
                 <div className="absolute right-2 top-2 z-10 rounded-full bg-black/50 px-2 py-1 text-xs font-bold text-white">
                   #{game.trendingRank}
                 </div>
-                <GameCard id={game.id} title={game.title} image={game.image} href={game.href} />
+                <GameCard id={game.id} title={game.title} image={game.image} />
                 <div className="mt-1 flex items-center justify-between text-xs text-muted-foreground">
                   <span>{game.category}</span>
                   <span>{game.playCount.toLocaleString()} plays</span>

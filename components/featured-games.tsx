@@ -38,7 +38,7 @@ export function FeaturedGames() {
       >
         {featuredGames.map((game) => (
           <div key={game.id} className="min-w-full">
-            <GameCard id={game.id} title={game.title} image={game.image} href={game.href} className="h-full w-full" />
+            <GameCard id={game.id} title={game.title} image={game.image}  className="h-full w-full" />
           </div>
         ))}
       </div>

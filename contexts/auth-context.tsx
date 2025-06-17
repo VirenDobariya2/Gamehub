@@ -10,39 +10,35 @@ import React, {
 import { useRouter } from "next/navigation"
 
 // ---------- Types ---------- //
-/**
- * @typedef {Object} User
- * @property {string} id
- * @property {string} name
- * @property {string} email
- * @property {"user"|"admin"} role
- * @property {string} [username]
- */
+export type User = {
+  id: string
+  name: string
+  email: string
+  role: "user" | "admin"
+  username?: string
+}
 
-/**
- * @typedef {Object} AuthContextType
- * @property {User|null} user
- * @property {boolean} isLoading
- * @property {boolean} isAdmin
- * @property {(token: string, user: User) => void} login
- * @property {() => void} logout
- */
+export type AuthContextType = {
+  user: User | null
+  isLoading: boolean
+  isAdmin: boolean
+  login: (token: string, userData: User) => void
+  logout: () => void
+}
+
+type AuthProviderProps = {
+  children: ReactNode
+}
 
 // ---------- Context ---------- //
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 // ---------- Provider ---------- //
-/**
- * @typedef {Object} AuthProviderProps
- * @property {ReactNode} children
- */
-
-export const AuthProvider = ({ children }) => {
+export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const router = useRouter()
 
-  // Check auth once on mount
   useEffect(() => {
     const token = localStorage.getItem("token")
     const storedUser = localStorage.getItem("user")
@@ -60,7 +56,7 @@ export const AuthProvider = ({ children }) => {
     setIsLoading(false)
   }, [])
 
-  const login = (token, userData) => {
+  const login = (token: string, userData: User) => {
     localStorage.setItem("token", token)
     localStorage.setItem("user", JSON.stringify(userData))
     setUser(userData)

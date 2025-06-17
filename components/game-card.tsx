@@ -3,12 +3,13 @@
 import Link from "next/link"
 import { cn } from "@/lib/utils"
 import { FavoriteButton } from "@/components/favorite-button"
+import { games } from "@/app/data/games"
+import { useRef } from "react"
 
 interface GameCardProps {
   id: string
   title: string
   image: string
- 
   className?: string
   showFavoriteButton?: boolean
   category?: string
@@ -19,24 +20,25 @@ export function GameCard({
   id,
   title,
   image,
-  
   className,
   showFavoriteButton = false,
   category = "Action",
   rating = 4.5,
 }: GameCardProps) {
-  const gameData = {
+  const gameFrameRef = useRef<HTMLDivElement>(null)
+
+  const game = {
     id,
     title,
     image,
-    
     category,
     rating,
+    href: `/games/${id}`, // ✅ Add missing `href` to satisfy FavoriteButton's prop
   }
 
   return (
     <div className={cn("game-card group", className)}>
-      <div className="relative overflow-hidden rounded-lg">
+      <div className="relative overflow-hidden rounded-lg" ref={gameFrameRef}>
         <Link href={`/games/${id}`}>
           <img
             src={image}
@@ -46,7 +48,7 @@ export function GameCard({
         </Link>
         {showFavoriteButton && (
           <FavoriteButton
-            game={gameData}
+            game={game}
             variant="icon"
             className="absolute right-2 top-2 opacity-0 transition-opacity group-hover:opacity-100"
           />

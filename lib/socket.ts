@@ -1,2 +1,2 @@
 import { io } from "socket.io-client"
-export const socket = io("http://localhost:3000") // or deployed URL
+export const socket = io("http://localhost:3000") 
