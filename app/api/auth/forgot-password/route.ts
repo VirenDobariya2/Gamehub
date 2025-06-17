@@ -63,7 +63,7 @@ export async function POST(request : NextRequest) {
     if (user) {
       // Generate reset token
       const resetToken = crypto.randomBytes(32).toString("hex")
-      const resetTokenExpiry = new Date(Date.now() + 3600000) // 1 hour from now
+      const resetTokenExpiry = new Date(Date.now() + 3600000) 
 
       // Save reset token to user document
       await usersCollection.updateOne(
