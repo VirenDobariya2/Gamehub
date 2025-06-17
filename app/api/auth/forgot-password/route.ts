@@ -7,7 +7,7 @@ const MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost:27017/gamehu
 
 // In a real application, you would use a proper email service like SendGrid, Mailgun, etc.
 async function sendPasswordResetEmail(email: string, resetToken: string) {
-  const resetUrl = `${process.env.NEXTAUTH_URL || "http://localhost:3000"}/reset-password?token=${resetToken}`
+  const resetUrl = `${process.env.NEXTAUTH_URL || "http://localhost:3000"}/forgot-password?token=${resetToken}`
 
   // For development, we'll just log the reset URL
   // In production, replace this with actual email sending logic
