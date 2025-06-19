@@ -24,6 +24,7 @@ export interface Game {
   title: string;
   description: string;
   image: string;
+   href?: string;
   category: string;
   tags: string[];
   embedWrapper: string;
@@ -58,7 +59,7 @@ export const games: readonly Game[] = [
     description:
       "Astray is a first-person motorcycle racing game developed by Soner Kara. Ride through endless highways, dodge traffic, and complete missions to unlock new bikes and upgrades.",
     category: "Racing",
-    image: "/gamethub.webp",
+    image: "/thumb/astray.png",
     video: "/game.mp4",
     embedWrapper: "AstrayWrapper",
     developer: "SK Games",
@@ -161,8 +162,6 @@ export const games: readonly Game[] = [
     category: "Casual",
     embedWrapper: "TheAviatorWrapper",
     rating: 4.2,
-    reviews: 9876,
-
     isNew: true,
   },
   {
@@ -175,72 +174,5 @@ export const games: readonly Game[] = [
     embedWrapper: "TrafficRiderWrapper",
     rating: 4.1,
     reviews: 6510,
-  },
-  {
-    id: "solar-smash",
-    title: "Solar Smash",
-    description:
-      "Destroy planets with black‑holes & lasers. Stress relief 101.",
-    image: "/games/solar-smash/thumb.jpg",
-    tags: ["sim", "destruction", "space"],
-    category: "Simulation",
-    embedWrapper: "SolarSmashWrapper",
-    rating: 4.7,
-    reviews: 18523,
-  },
-  {
-    id: "endless-runner",
-    title: "Endless Runner X",
-    description: "Simple but brutal procedurally‑generated runner.",
-    image: "/games/endless-runner/thumb.jpg",
-    tags: ["runner", "arcade"],
-    category: "Arcade",
-    embedWrapper: "EndlessRunnerWrapper",
-    rating: 4.0,
-    reviews: 4320,
-  },
-  {
-    id: "zombie-defense",
-    title: "Zombie Defense TD",
-    description: "Build turrets, hold the line against hordes!",
-    image: "/games/zombie-defense/thumb.jpg",
-    tags: ["tower‑defense", "strategy"],
-    category: "Strategy",
-    embedWrapper: "ZombieDefenseWrapper",
-    rating: 4.3,
-    reviews: 5920,
-  },
-  {
-    id: "retro-racer",
-    title: "Retro Racer 1985",
-    description: "Low‑poly synthwave racing nostalgia.",
-    image: "/games/retro-racer/thumb.jpg",
-    tags: ["racing", "retro"],
-    category: "Racing",
-    embedWrapper: "RetroRacerWrapper",
-    rating: 4.5,
-    reviews: 8211,
-  },
-  {
-    id: "tower-merger",
-    title: "Tower Merger 3D",
-    description: "Merge blocks, build high, reach the stratosphere!",
-    image: "/games/tower-merger/thumb.jpg",
-    tags: ["puzzle", "merge", "3d"],
-    category: "Puzzle",
-    embedWrapper: "TowerMergerWrapper",
-    rating: 4.2,
-    reviews: 3780,
-  },
-  {
-    id: "pixel-basket",
-    title: "Pixel Basket Jam",
-    description: "One‑tap dunk contest in 8‑bit style.",
-    image: "/games/pixel-basket/thumb.jpg",
-    tags: ["sports", "basketball", "pixel"],
-    category: "Sports",
-    embedWrapper: "PixelBasketWrapper",
-    rating: 4.1,
-    reviews: 2890,
   },
 ] as const;

@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import Script from "next/script";
@@ -33,20 +34,37 @@ export default function HomePage() {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const [recentGames, setRecentGames] = useState<Game[]>([]);
+  const [user, setUser] = useState<{ _id: string; email: string; role?: string } | null>(null);
 
   const allTags = Array.from(new Set(games.flatMap((game) => game.tags || [])));
 
   useEffect(() => {
-    const stored = localStorage.getItem("recentGames");
-    if (stored) {
-      setRecentGames(JSON.parse(stored) as Game[]);
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      try {
+        const parsedUser = JSON.parse(storedUser);
+        setUser(parsedUser);
+      } catch (err) {
+        console.error("Failed to parse user from localStorage");
+      }
     }
   }, []);
 
+  useEffect(() => {
+    if (!user || !user.role) return;
+    const recentKey = `recentGames_${user.role}_${user._id}`;
+    const stored = localStorage.getItem(recentKey);
+    if (stored) {
+      setRecentGames(JSON.parse(stored) as Game[]);
+    }
+  }, [user]);
+
   const handleRecentGame = (game: Game) => {
-    const current = JSON.parse(localStorage.getItem("recentGames") || "[]") as Game[];
+    if (!user || !user.role) return;
+    const recentKey = `recentGames_${user.role}_${user._id}`;
+    const current = JSON.parse(localStorage.getItem(recentKey) || "[]") as Game[];
     const updated = [game, ...current.filter((g) => g.id !== game.id)].slice(0, 6);
-    localStorage.setItem("recentGames", JSON.stringify(updated));
+    localStorage.setItem(recentKey, JSON.stringify(updated));
     setRecentGames(updated);
   };
 
@@ -66,13 +84,10 @@ export default function HomePage() {
         crossOrigin="anonymous"
       />
       <div className="flex min-h-screen flex-col bg-background text-white">
-        {/* Header */}
         <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur">
           <div className="container flex h-16 items-center justify-between px-4">
             <div className="flex items-center gap-6">
-              <Link href="/" className="text-xl font-bold">
-                GameHub
-              </Link>
+              <Link href="/" className="text-xl font-bold">GameHub</Link>
               <MainNav />
             </div>
             <div className="flex items-center gap-4">
@@ -82,14 +97,13 @@ export default function HomePage() {
           </div>
         </header>
 
-        {/* Main Content */}
         <main className="flex-1">
           <section className="container px-4 py-6">
-            <div className="mb-8 flex flex-row gap-5">
-              <h1 className="bg-gray-50 text-black font-2xl mx-w-20">
-                Recent<span> game</span>:
+            <div className="mb-5 flex flex-row gap-5 items-center">
+              <h1 className="text-white font-medium text-lg max-w-28 px-4 object-cover border border-transparent hover:border-purple-600 cursor-pointer transition duration-200">
+                Recently played <span className="text-center">:</span>
               </h1>
-              {recentGames.length > 0 && (
+              {user && recentGames.length > 0 && (
                 <div className="hidden lg:flex items-center gap-2">
                   {recentGames.map((game) => (
                     <Link href={`/games/${game.id}`} key={game.id}>
@@ -97,7 +111,7 @@ export default function HomePage() {
                         src={game.image}
                         alt={game.title}
                         title={game.title}
-                        className="h-16 w-20 rounded object-cover hover:ring-2 ring-white transition"
+                        className="h-16 w-20 rounded object-cover border-2 border-transparent hover:border-purple-600 cursor-pointer transition duration-200"
                       />
                     </Link>
                   ))}
@@ -105,7 +119,8 @@ export default function HomePage() {
               )}
             </div>
 
-            {/* Hero Section */}
+            <div className="border-b border-gray-600 w-full mb-5"></div>
+
             <div className="mb-10 flex flex-col lg:flex-row gap-6">
               <div className="relative w-full lg:w-3/4 overflow-hidden rounded-lg">
                 <img
@@ -115,15 +130,11 @@ export default function HomePage() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-r from-black/80 to-black/30" />
                 <div className="absolute inset-0 flex flex-col items-start justify-center p-8 z-10">
-                  <h1 className="mb-4 text-4xl font-bold text-white">
-                    Explore the Best Free Online Games
-                  </h1>
+                  <h1 className="mb-4 text-4xl font-bold text-white">Explore the Best Free Online Games</h1>
                   <p className="mb-6 max-w-md text-lg text-white">
                     Dive into a world of endless fun with our curated collection of top-rated games.
                   </p>
-                  <Button size="lg" className="bg-purple-600 text-white">
-                    Play Now
-                  </Button>
+                  <Button size="lg" className="bg-purple-600 text-white">Play Now</Button>
                 </div>
               </div>
 
@@ -142,7 +153,6 @@ export default function HomePage() {
               </aside>
             </div>
 
-            {/* Categories */}
             <section className="mb-10">
               <h2 className="mb-4 text-2xl font-bold">Categories</h2>
               <div className="flex flex-wrap gap-2">
@@ -159,7 +169,6 @@ export default function HomePage() {
               </div>
             </section>
 
-            {/* All Games */}
             <section className="mb-10">
               <div className="mb-4 flex items-center justify-between">
                 <h2 className="text-2xl font-bold">
@@ -178,6 +187,7 @@ export default function HomePage() {
                       key={game.id}
                       {...game}
                       onPlay={() => handleRecentGame(game)}
+                      category={selectedCategory}
                     />
                   ))
                 ) : (
@@ -186,7 +196,6 @@ export default function HomePage() {
               </div>
             </section>
 
-            {/* Recommended Section */}
             <section className="mb-10">
               <h2 className="mb-4 text-2xl font-bold">
                 {selectedTag ? `Recommended - "${selectedTag}"` : "Top Recommendations"}
@@ -195,20 +204,14 @@ export default function HomePage() {
                 {(selectedTag ? games.filter((g: Game) => g.tags?.includes(selectedTag)) : games)
                   .slice(0, 3)
                   .map((game) => (
-                    <div
-                      key={game.id}
-                      className="rounded-lg bg-muted p-3 hover:shadow-lg transition"
-                    >
+                    <div key={game.id} className="rounded-lg bg-muted p-3 hover:shadow-lg transition">
                       <img src={game.image} alt={game.title} className="rounded mb-2" />
                       <h3 className="text-lg font-semibold">{game.title}</h3>
-                      <p className="text-sm text-muted-foreground">
-                        {game.playerCount || "0"} players
-                      </p>
+                      <p className="text-sm text-muted-foreground">{game.playerCount || "0"} players</p>
                     </div>
                   ))}
               </div>
 
-              {/* Tags */}
               <div className="mt-4 flex flex-wrap gap-2">
                 {allTags.map((tag) => (
                   <Button
@@ -223,26 +226,6 @@ export default function HomePage() {
               </div>
             </section>
 
-            {/* Recently Played */}
-            {recentGames.length > 0 && (
-              <section className="mt-8">
-                <h2 className="mb-3 text-xl font-semibold">Recently Played</h2>
-                <div className="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-6 gap-2">
-                  {recentGames.map((game) => (
-                    <Link href={`/games/${game.id}`} key={game.id}>
-                      <img
-                        src={game.image}
-                        alt={game.title}
-                        title={game.title}
-                        className="h-16 w-full rounded object-cover hover:opacity-80"
-                      />
-                    </Link>
-                  ))}
-                </div>
-              </section>
-            )}
-
-            {/* Sponsored Ad */}
             <aside className="mx-auto w-full lg:mx-0 mt-5">
               <div className="rounded bg-white p-4 shadow">
                 <h2 className="mb-2 text-lg font-semibold text-black">Sponsored</h2>
@@ -259,7 +242,6 @@ export default function HomePage() {
           </section>
         </main>
 
-        {/* Footer */}
         <footer className="border-t py-6">
           <div className="container px-4 text-center text-sm text-muted-foreground">
             <div className="flex flex-wrap justify-center gap-4 mb-2">

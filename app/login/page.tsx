@@ -1,7 +1,6 @@
 "use client";
 
 import type React from "react";
-
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -11,10 +10,7 @@ import { Facebook, Eye, EyeOff, ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 export default function LoginPage() {
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
+  const [formData, setFormData] = useState({ email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
@@ -27,9 +23,7 @@ export default function LoginPage() {
     try {
       const response = await fetch("/api/auth/login", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
 
@@ -66,9 +60,9 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen">
-      {/* Left half - video */}
-      <div className="w-1/2 h-screen overflow-hidden">
+    <div className="relative min-h-screen flex flex-col md:flex-row">
+      {/* Video Background */}
+      <div className="absolute md:relative w-full md:w-1/2 h-full z-0">
         <video
           className="object-cover w-full h-full"
           autoPlay
@@ -79,39 +73,33 @@ export default function LoginPage() {
           <source src="/game.mp4" type="video/mp4" />
           Your browser does not support the video tag.
         </video>
+        {/* Overlay for mobile readability */}
+        <div className="absolute inset-0 bg-black/60 md:hidden"></div>
       </div>
 
-      {/* Right half - login form */}
-      <div className="w-1/2 flex flex-col justify-center px-16">
-        <div className="max-w-md w-full mx-auto space-y-6 rounded-lg p-6 shadow-lg">
+      {/* Login Form */}
+      <div className="relative z-10 w-full md:w-1/2 flex items-center justify-center px-6 py-12 md:px-16 bg-background/90 md:bg-background">
+        <div className="max-w-md w-full mx-auto space-y-6 rounded-lg p-6 shadow-lg bg-card/90 md:bg-card">
           <div className="text-center">
             <Link href="/" className="inline-block">
               <h1 className="text-2xl font-bold text-white">GameHub</h1>
             </Link>
-            <h2 className="mt-6 text-3xl font-bold text-white">
-              Welcome back!
-            </h2>
+            <h2 className="mt-6 text-3xl font-bold text-white">Welcome back!</h2>
             <p className="mt-2 text-muted-foreground">
               Please enter your credentials to continue
             </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Input
-                type="email"
-                placeholder="Email address"
-                className="bg-secondary"
-                value={formData.email}
-                onChange={(e) =>
-                  setFormData({ ...formData, email: e.target.value })
-                }
-                required
-              />
-            </div>
-
-            {/* Password with toggle */}
-            <div className="relative space-y-2">
+            <Input
+              type="email"
+              placeholder="Email address"
+              className="bg-secondary"
+              value={formData.email}
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              required
+            />
+            <div className="relative">
               <Input
                 type={showPassword ? "text" : "password"}
                 placeholder="Password"
@@ -125,7 +113,7 @@ export default function LoginPage() {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-3 -translate-y-1/2 text-muted-foreground"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
                 aria-label={showPassword ? "Hide password" : "Show password"}
               >
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
@@ -140,6 +128,7 @@ export default function LoginPage() {
                 Forgot password?
               </Link>
             </div>
+
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading ? "Signing in..." : "Log in"}
             </Button>
@@ -150,9 +139,7 @@ export default function LoginPage() {
               <div className="w-full border-t border-gray-300"></div>
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-card px-2 text-muted-foreground">
-                Or continue with
-              </span>
+              <span className="bg-card px-2 text-muted-foreground">Or continue with</span>
             </div>
           </div>
 
@@ -186,11 +173,8 @@ export default function LoginPage() {
           </div>
 
           <p className="text-center text-sm text-muted-foreground mt-4">
-            Don't have an account?{" "}
-            <Link
-              href="/signup"
-              className="font-medium text-primary hover:underline"
-            >
+            Don&apos;t have an account?{" "}
+            <Link href="/signup" className="font-medium text-primary hover:underline">
               Sign up
             </Link>
           </p>

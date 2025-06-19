@@ -3,17 +3,24 @@
 import { useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import type { Game } from "@/app/data/games"; // ✅ adjust this path as needed
 
-interface GameRendererProps {
-  id: string;
-  title: string;
-  image: string;
-  video?: string;
-  playerCount?: number; 
+interface GameRendererProps extends Pick<
+  Game,
+  "id" | "title" | "image" | "video" | "playerCount" | "category"
+> {
   onPlay?: () => void;
 }
 
-export default function GameRenderer({ id, title, image, video, onPlay }: GameRendererProps) {
+export default function GameRenderer({
+  id,
+  title,
+  image,
+  video,
+  playerCount,
+  category,
+  onPlay,
+}: GameRendererProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
   return (
@@ -22,9 +29,9 @@ export default function GameRenderer({ id, title, image, video, onPlay }: GameRe
       onClick={onPlay}
       className="group rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-200"
       onMouseEnter={() => {
-        if (videoRef.current) {
-          videoRef.current.play().catch((err) => console.warn("Video play interrupted:", err));
-        }
+        videoRef.current?.play().catch((err) =>
+          console.warn("Video play interrupted:", err)
+        );
       }}
       onMouseLeave={() => {
         if (videoRef.current) {
@@ -43,7 +50,6 @@ export default function GameRenderer({ id, title, image, video, onPlay }: GameRe
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
         />
 
-        {/* ✅ Only render video if provided */}
         {video && (
           <video
             ref={videoRef}
@@ -58,6 +64,12 @@ export default function GameRenderer({ id, title, image, video, onPlay }: GameRe
 
       <div className="p-3 bg-white dark:bg-zinc-800">
         <h2 className="text-sm font-semibold line-clamp-1">{title}</h2>
+        {category && <p className="text-xs text-muted-foreground mt-1">{category}</p>}
+        {typeof playerCount === "number" && (
+          <p className="text-xs text-muted-foreground">
+            {playerCount.toLocaleString()} players
+          </p>
+        )}
       </div>
     </Link>
   );

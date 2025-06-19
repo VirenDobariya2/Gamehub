@@ -1,7 +1,7 @@
 "use client";
 
 import { use, useEffect, useRef, useState } from "react";
-import { notFound } from "next/navigation";
+import { notFound, useParams } from "next/navigation";
 import Script from "next/script";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -13,8 +13,13 @@ import { Star, Play } from "lucide-react";
 import { games } from "@/app/data/games";
 import GameEmbedClient from "../_clients/GameEmbedClient";
 
-export default function GamePage({ params }) {
-  const { id } = use(params);
+
+
+
+export default function GamePage() {
+   const params = useParams();
+   const id = String(params?.id); 
+  // const { id } = use(params as unknown as Promise<{ id: string }>);
   const [isStarted, setIsStarted] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [likes, setLikes] = useState(0);
@@ -87,26 +92,29 @@ export default function GamePage({ params }) {
   };
 
   const handleFullscreen = () => {
-    const el = gameFrameRef.current;
+  const el = gameFrameRef.current;
 
-    if (!el) return;
+  if (!el) return;
 
-    if (!document.fullscreenElement) {
-      // Enter fullscreen
-      if (el.requestFullscreen) el.requestFullscreen();
-      else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
-      else if (el.mozRequestFullScreen) el.mozRequestFullScreen();
-      else if (el.msRequestFullscreen) el.msRequestFullscreen();
-      setIsFullscreen(true);
-    } else {
-      // Exit fullscreen
-      if (document.exitFullscreen) document.exitFullscreen();
-      else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
-      else if (document.mozCancelFullScreen) document.mozCancelFullScreen();
-      else if (document.msExitFullscreen) document.msExitFullscreen();
-      setIsFullscreen(false);
-    }
-  };
+  const anyEl = el;
+
+  if (!document.fullscreenElement) {
+    if (el.requestFullscreen) el.requestFullscreen();
+    else if (anyEl.webkitRequestFullscreen) anyEl.webkitRequestFullscreen();
+    else if (anyEl.mozRequestFullScreen) anyEl.mozRequestFullScreen();
+    else if (anyEl.msRequestFullscreen) anyEl.msRequestFullscreen();
+    setIsFullscreen(true);
+  } else {
+    const anyDoc = document;
+
+    if (document.exitFullscreen) document.exitFullscreen();
+    else if (anyDoc.webkitExitFullscreen) anyDoc.webkitExitFullscreen();
+    else if (anyDoc.mozCancelFullScreen) anyDoc.mozCancelFullScreen();
+    else if (anyDoc.msExitFullscreen) anyDoc.msExitFullscreen();
+    setIsFullscreen(false);
+  }
+};
+
 
   useEffect(() => {
     const handleFullscreenChange = () => {
@@ -177,7 +185,7 @@ export default function GamePage({ params }) {
                       muted
                       loop
                       playsInline
-                      className="absolute top-0 left-0 w-full h-full object-cover opacity-20 z-0"
+                      className="absolute top-0 left-0 w-full h-full object-cover opacity-30 z-0 filter blur-sm"
                     >
                       <source src={game.video} type="video/mp4" />
                     </video>
@@ -224,96 +232,96 @@ export default function GamePage({ params }) {
                         Like
                       </span>
                     </div>
-        <div>
-      {/* Dislike + Modal Section */}
-      <div className="relative inline-block group">
-        <div
-          onClick={handleDislikeClick}
-          title="Dislike"
-          className={`flex cursor-pointer items-center gap-2 px-3 py-1 rounded-full border transition ${
-            userReaction === "dislike"
-              ? "bg-red-600 text-white"
-              : "hover:bg-red-100 hover:text-red-700"
-          }`}
-        >
-          👎 {dislikes}
-        </div>
+                    <div>
+                      {/* Dislike + Modal Section */}
+                      <div className="relative inline-block group">
+                        <div
+                          onClick={handleDislikeClick}
+                          title="Dislike"
+                          className={`flex cursor-pointer items-center gap-2 px-3 py-1 rounded-full border transition ${
+                            userReaction === "dislike"
+                              ? "bg-red-600 text-white"
+                              : "hover:bg-red-100 hover:text-red-700"
+                          }`}
+                        >
+                          👎 {dislikes}
+                        </div>
 
-        {/* Tooltip (Optional) */}
-        <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity z-30">
-          Dislike
-        </span>
+                        {/* Tooltip (Optional) */}
+                        <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity z-30">
+                          Dislike
+                        </span>
 
-        {/* "Don't like this game?" Modal */}
-        {showDislikeModal && (
-          <div className="absolute bottom-full mb-12 left-1/2 -translate-x-1/2 w-64 bg-[#2c2c34] text-white p-4 rounded-xl shadow-lg z-50">
-            <div className="flex justify-between items-center mb-3">
-              <span className="text-sm font-medium">Don't like this game?</span>
-              <button
-                onClick={() => setShowDislikeModal(false)}
-                className="text-white text-sm"
-              >
-                ✕
-              </button>
-            </div>
-            <button
-              onClick={handleTellUsWhy}
-              className="w-full bg-[#8b5cf6] hover:bg-[#7c3aed] transition text-white py-2 rounded-full text-sm font-semibold"
-            >
-              Tell us why
-            </button>
-          </div>
-        )}
-      </div>
+                        {/* "Don't like this game?" Modal */}
+                        {showDislikeModal && (
+                          <div className="absolute bottom-full mb-12 left-1/2 -translate-x-1/2 w-64 bg-[#2c2c34] text-white p-4 rounded-xl shadow-lg z-50">
+                            <div className="flex justify-between items-center mb-3">
+                              <span className="text-sm font-medium">
+                                Don't like this game?
+                              </span>
+                              <button
+                                onClick={() => setShowDislikeModal(false)}
+                                className="text-white text-sm"
+                              >
+                                ✕
+                              </button>
+                            </div>
+                            <button
+                              onClick={handleTellUsWhy}
+                              className="w-full bg-[#8b5cf6] hover:bg-[#7c3aed] transition text-white py-2 rounded-full text-sm font-semibold"
+                            >
+                              Tell us why
+                            </button>
+                          </div>
+                        )}
+                      </div>
 
-      {/* Simulate login sidebar */}
-      {showLoginSidebar && (
-        <div className="fixed top-0 right-0 w-[300px] h-full bg-white shadow-xl p-4 z-50">
-          <h2 className="text-xl font-bold mb-4">Login</h2>
-          <button
-            className="bg-blue-500 text-white px-4 py-2 rounded"
-            onClick={() => {
-              setIsLoggedIn(true);
-              setShowLoginSidebar(false);
-            }}
-          >
-            Simulate Login
-          </button>
-        </div>
-      )}
-    </div>
-            
+                      {/* Simulate login sidebar */}
+                      {showLoginSidebar && (
+                        <div className="fixed top-0 right-0 w-[300px] h-full bg-white shadow-xl p-4 z-50">
+                          <h2 className="text-xl font-bold mb-4">Login</h2>
+                          <button
+                            className="bg-blue-500 text-white px-4 py-2 rounded"
+                            onClick={() => {
+                              setIsLoggedIn(true);
+                              setShowLoginSidebar(false);
+                            }}
+                          >
+                            Simulate Login
+                          </button>
+                        </div>
+                      )}
+                    </div>
+
                     <FavoriteButton
                       game={game}
-                      title="Favorite"
-                      variant="ghost"
+                      variant="icon"
                       className="cursor-pointer items-center gap-2 px-3 py-1 rounded-full border transition"
                     />
 
-<div className="relative group inline-block">
-                    <div
-                      className="cursor-pointer items-center gap-2 px-3 py-1 rounded-full border transition"
-                      title="Comment"
-                    >
-                      💬
-                    </div>
-                     <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity z-30">
+                    <div className="relative group inline-block">
+                      <div
+                        className="cursor-pointer items-center gap-2 px-3 py-1 rounded-full border transition"
+                        title="Comment"
+                      >
+                        💬
+                      </div>
+                      <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity z-30">
                         comment
                       </span>
-                    
-</div>
-<div className="relative group inline-block">
-                    <div
-                      onClick={handleFullscreen}
-                      title="Fullscreen"
-                      className="cursor-pointer items-center gap-2 px-3 py-1 rounded-full border transition"
-                    >
-                      ⛶
                     </div>
-                     <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity z-30">
+                    <div ref={gameFrameRef}  className="relative group inline-block">
+                      <div
+                        onClick={handleFullscreen}
+                        title="Fullscreen"
+                        className="cursor-pointer items-center gap-2 px-3 py-1 rounded-full border transition"
+                      >
+                        ⛶
+                      </div>
+                      <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity z-30">
                         Full Screen
                       </span>
-                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
