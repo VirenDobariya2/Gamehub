@@ -51,6 +51,7 @@ export interface Game {
   features?: string[];
   faq?: FAQ[];
   similarGames?: SimilarGame[];
+  size?: "small" | "large";
 }
 export const games: readonly Game[] = [
   {
@@ -163,6 +164,7 @@ export const games: readonly Game[] = [
     embedWrapper: "TheAviatorWrapper",
     rating: 4.2,
     isNew: true,
+    size:"large"
   },
   {
     id: "traffic-rider",

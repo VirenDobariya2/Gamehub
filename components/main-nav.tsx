@@ -6,9 +6,9 @@ import { cn } from "@/lib/utils"
 const navItems = [
   { href: "/", label: "Home" },
   { href: "/categories", label: "Categories" },
-  { href: "/new-games", label: "New Games" },
-  { href: "/trending", label: "Trending" },
-  { href: "/collections", label: "Collections" },
+  // { href: "/new-games", label: "New Games" },
+  // { href: "/trending", label: "Trending" },
+  // { href: "/collections", label: "Collections" },
 ]
 
 export function MainNav() {
