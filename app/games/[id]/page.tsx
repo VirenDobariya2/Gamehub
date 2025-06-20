@@ -21,11 +21,9 @@ export default function GamePage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [likes, setLikes] = useState(0);
   const [dislikes, setDislikes] = useState(0);
-  const [userReaction, setUserReaction] = useState<"like" | "dislike" | null>(
-    null
-  );
+  const [userReaction, setUserReaction] = useState<"like" | "dislike" | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [showDislikeModal, setShowDislikeModal] = useState(false);
+ const [showDislikeModal, setShowDislikeModal] = useState(false);
   const [showLoginSidebar, setShowLoginSidebar] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showFeedbackBox, setShowFeedbackBox] = useState(false);
@@ -61,7 +59,7 @@ export default function GamePage() {
     }
   };
 
-  const handleDislike = () => {
+   const handleDislike = () => {
     if (userReaction === "dislike") {
       setDislikes((prev) => Math.max(prev - 1, 0));
       setUserReaction(null);
@@ -93,21 +91,21 @@ export default function GamePage() {
   };
 
   const handleFullscreen = () => {
-    const el = gameFrameRef.current;
-    if (!el) return;
+  const el = gameFrameRef.current;
+  if (!el) return;
 
-    if (!document.fullscreenElement) {
-      el.requestFullscreen().catch((err) => {
-        console.error("Error attempting to enable fullscreen", err);
-      });
-      setIsFullscreen(true);
-    } else {
-      document.exitFullscreen().catch((err) => {
-        console.error("Error attempting to exit fullscreen", err);
-      });
-      setIsFullscreen(false);
-    }
-  };
+  if (!document.fullscreenElement) {
+    el.requestFullscreen().catch((err) => {
+      console.error("Error attempting to enable fullscreen", err);
+    });
+    setIsFullscreen(true);
+  } else {
+    document.exitFullscreen().catch((err) => {
+      console.error("Error attempting to exit fullscreen", err);
+    });
+    setIsFullscreen(false);
+  }
+};
 
   useEffect(() => {
     const handleFullscreenChange = () => {
@@ -173,9 +171,7 @@ export default function GamePage() {
             <div className="flex flex-col lg:flex-row gap-6">
               {/* Left Sidebar */}
               <aside className="hidden lg:block w-1/6">
-                <h2 className="text-sm font-semibold mb-2 text-white">
-                  Popular Games
-                </h2>
+                <h2 className="text-sm font-semibold mb-2 text-white">Popular Games</h2>
                 <div className="flex flex-col gap-4">
                   {leftGames.map((rec) => (
                     <Link
@@ -230,59 +226,55 @@ export default function GamePage() {
                   ) : (
                     <GameEmbedClient embedWrapper={game.embedWrapper} />
                   )}
-                  <div className="absolute bottom-4 left-4 flex gap-2 z-20">
-                    <div
-                      onClick={handleLike}
-                      className={`cursor-pointer px-3 py-1 rounded-full border text-sm ${
-                        userReaction === "like"
-                          ? "bg-green-600 text-white"
-                          : "hover:bg-green-100 hover:text-green-700"
-                      }`}
-                    >
-                      👍 {likes.toLocaleString()}
-                    </div>
-                    <div
-                      onClick={handleDislikeClick}
-                      className={`cursor-pointer px-3 py-1 rounded-full border text-sm ${
-                        userReaction === "dislike"
-                          ? "bg-red-600 text-white"
-                          : "hover:bg-red-100 hover:text-red-700"
-                      }`}
-                    >
-                      👎 {dislikes}
-                    </div>
-                    <FavoriteButton
-                      game={game}
-                      variant="icon"
-                      className="cursor-pointer px-3 py-1 rounded-full border text-sm"
-                    />
-                    <div
-                      onClick={handleFullscreen}
-                      className="cursor-pointer px-3 py-1 rounded-full border text-sm hover:bg-gray-200 hover:text-black"
-                    >
-                      ⛶
-                    </div>
-                  </div>
+                   <div className="absolute bottom-4 left-4 flex gap-2 z-20">
+      <div
+        onClick={handleLike}
+        className={`cursor-pointer px-3 py-1 rounded-full border text-sm ${
+          userReaction === "like" ? "bg-green-600 text-white" : "hover:bg-green-100 hover:text-green-700"
+        }`}
+      >
+        👍 {likes.toLocaleString()}
+      </div>
+     <div
+                  onClick={handleDislikeClick}
+                  className={`cursor-pointer px-3 py-1 rounded-full border text-sm ${
+                    userReaction === "dislike" ? "bg-red-600 text-white" : "hover:bg-red-100 hover:text-red-700"
+                  }`}
+                >
+                  👎 {dislikes}
+                </div>
+      <FavoriteButton
+        game={game}
+        variant="icon"
+        className="cursor-pointer px-3 py-1 rounded-full border text-sm"
+      />
+      <div
+        onClick={handleFullscreen}
+        className="cursor-pointer px-3 py-1 rounded-full border text-sm hover:bg-gray-200 hover:text-black"
+      >
+        ⛶
+      </div>
+    </div>
                 </div>
 
-                <div className="mt-6 w-full max-w-5xl bg-white rounded shadow p-4">
-                  <h2 className="text-lg font-semibold mb-2">Sponsored</h2>
-                  <ins
-                    className="adsbygoogle"
-                    style={{ display: "block" }}
-                    data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
-                    data-ad-slot="1234567890"
-                    data-ad-format="auto"
-                    data-full-width-responsive="true"
-                  />
-                </div>
+               
+               
+                 <div className="mt-6 w-full max-w-5xl bg-white rounded shadow p-4">
+              <h2 className="text-lg font-semibold mb-2">Sponsored</h2>
+              <ins
+                className="adsbygoogle"
+                style={{ display: "block" }}
+                data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+                data-ad-slot="1234567890"
+                data-ad-format="auto"
+                data-full-width-responsive="true"
+              />
+            </div>
               </section>
 
               {/* Right Sidebar */}
               <aside className="hidden lg:block w-1/6">
-                <h2 className="text-sm font-semibold mb-2 text-white">
-                  You May Also Like
-                </h2>
+                <h2 className="text-sm font-semibold mb-2 text-white">You May Also Like</h2>
                 <div className="flex flex-col gap-4">
                   {rightGames.map((rec) => (
                     <Link
@@ -299,107 +291,99 @@ export default function GamePage() {
                   ))}
                 </div>
               </aside>
+              
             </div>
+            
+<div className="bg-white text-black rounded-lg shadow p-6 flex flex-col md:flex-row-reverse gap-6 items-start mt-5">
+  <img
+    src={game.image}
+    alt={game.title}
+    className="w-96 h-96 object-cover rounded"
+  />
 
-            <div className="bg-white text-black rounded-lg shadow p-6 flex flex-col md:flex-row-reverse gap-6 items-start mt-5">
-              <img
-                src={game.image}
-                alt={game.title}
-                className="w-96 h-96 object-cover rounded"
-              />
+  <div className="flex-1">
+  
+    <h1 className="text-xl font-bold mb-2">{game.title}</h1>
 
-              <div className="flex-1">
-                <h1 className="text-xl font-bold mb-2">{game.title}</h1>
+                    <span className="text-4xl font-bold">{game.rating}</span>
+                    <div>
+                      <div className="flex">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <Star
+                            key={star}
+                            className={`h-6 w-6 ${
+                              star <= Math.floor(game.rating)
+                                ? "fill-primary text-primary"
+                                : star === Math.ceil(game.rating) &&
+                                  game.rating % 1 !== 0
+                                ? "fill-primary/50 text-primary"
+                                : "fill-none text-muted-foreground"
+                            }`}
+                          />
+                        ))}
+                      </div>
+                      <span className="text-sm text-muted-foreground">
+                        {game.reviews?.toLocaleString?.() || "0"} reviews
+                      </span>
+                    </div>
 
-                <span className="text-4xl font-bold">{game.rating}</span>
-                <div>
-                  <div className="flex">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <Star
-                        key={star}
-                        className={`h-6 w-6 ${
-                          star <= Math.floor(game.rating)
-                            ? "fill-primary text-primary"
-                            : star === Math.ceil(game.rating) &&
-                              game.rating % 1 !== 0
-                            ? "fill-primary/50 text-primary"
-                            : "fill-none text-muted-foreground"
-                        }`}
-                      />
-                    ))}
-                  </div>
-                  <span className="text-sm text-muted-foreground">
-                    {game.reviews?.toLocaleString?.() || "0"} reviews
-                  </span>
-                </div>
+    <p className="text-sm text-gray-700 mb-4">{game.description}</p>
+    <p><strong>Category:</strong> {game.category}</p>
+    <p><strong>Release Date:</strong> {game.releaseDate || "Unknown"}</p>
+    <p><strong>Developer:</strong> {game.developer || "Unknown"}</p>
+    <p><strong>Technology:</strong> {game.technology || "Unknown"}</p>
+    <p><strong>Platforms:</strong> {game.platforms?.join(", ") || "Unknown"}</p>
+  </div>
+</div>
 
-                <p className="text-sm text-gray-700 mb-4">{game.description}</p>
-                <p>
-                  <strong>Category:</strong> {game.category}
-                </p>
-                <p>
-                  <strong>Release Date:</strong> {game.releaseDate || "Unknown"}
-                </p>
-                <p>
-                  <strong>Developer:</strong> {game.developer || "Unknown"}
-                </p>
-                <p>
-                  <strong>Technology:</strong> {game.technology || "Unknown"}
-                </p>
-                <p>
-                  <strong>Platforms:</strong>{" "}
-                  {game.platforms?.join(", ") || "Unknown"}
-                </p>
-              </div>
-            </div>
+{showDislikeModal && (
+          <div className="fixed bottom-20 left-1/2 -translate-x-1/2 bg-[#2c2c34] text-white p-4 rounded-xl z-50 shadow-lg">
+            <p className="mb-2 font-medium">Don't like this game?</p>
+            <button
+              onClick={handleTellUsWhy}
+              className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-full"
+            >
+              Tell us why
+            </button>
+          </div>
+        )}
 
-            {showDislikeModal && (
-              <div className="fixed bottom-20 left-1/2 -translate-x-1/2 bg-[#2c2c34] text-white p-4 rounded-xl z-50 shadow-lg">
-                <p className="mb-2 font-medium">Don't like this game?</p>
-                <button
-                  onClick={handleTellUsWhy}
-                  className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-full"
-                >
-                  Tell us why
-                </button>
-              </div>
-            )}
+        {showFeedbackBox && (
+          <div className="fixed bottom-20 left-1/2 -translate-x-1/2 w-96 bg-white text-black p-4 rounded-xl shadow-xl z-50">
+            <textarea
+              value={feedback}
+              onChange={(e) => setFeedback(e.target.value)}
+              className="w-full h-24 p-2 border rounded mb-2"
+              placeholder="Tell us what you didn’t like..."
+            />
+            <Button
+              onClick={() => {
+                handleDislike();
+                setShowFeedbackBox(false);
+                alert("Thanks for your feedback!");
+              }}
+              className="w-full bg-purple-600 hover:bg-purple-700 text-white"
+            >
+              Submit
+            </Button>
+          </div>
+        )}
 
-            {showFeedbackBox && (
-              <div className="fixed bottom-20 left-1/2 -translate-x-1/2 w-96 bg-white text-black p-4 rounded-xl shadow-xl z-50">
-                <textarea
-                  value={feedback}
-                  onChange={(e) => setFeedback(e.target.value)}
-                  className="w-full h-24 p-2 border rounded mb-2"
-                  placeholder="Tell us what you didn’t like..."
-                />
-                <Button
-                  onClick={() => {
-                    handleDislike();
-                    setShowFeedbackBox(false);
-                    alert("Thanks for your feedback!");
-                  }}
-                  className="w-full bg-purple-600 hover:bg-purple-700 text-white"
-                >
-                  Submit
-                </Button>
-              </div>
-            )}
+        {showLoginSidebar && (
+          <div className="fixed top-0 right-0 w-80 h-full bg-white shadow-xl p-6 z-50">
+            <h2 className="text-xl font-bold mb-4">Login</h2>
+            <Button
+              className="w-full bg-blue-600 text-white"
+              onClick={() => {
+                setIsLoggedIn(true);
+                setShowLoginSidebar(false);
+              }}
+            >
+              Simulate Login
+            </Button>
+          </div>
+        )}
 
-            {showLoginSidebar && (
-              <div className="fixed top-0 right-0 w-80 h-full bg-white shadow-xl p-6 z-50">
-                <h2 className="text-xl font-bold mb-4">Login</h2>
-                <Button
-                  className="w-full bg-blue-600 text-white"
-                  onClick={() => {
-                    setIsLoggedIn(true);
-                    setShowLoginSidebar(false);
-                  }}
-                >
-                  Simulate Login
-                </Button>
-              </div>
-            )}
           </main>
 
           {/* Footer */}
