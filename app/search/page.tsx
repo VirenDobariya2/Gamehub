@@ -5,15 +5,15 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { SearchBar } from "@/components/search-bar";
 import GameRenderer from "../games/_clients/GameRenderer";
-import { games } from "../data/games";
+
 import { Navbar } from "@/components/navbar";
 
 export default function SearchPage() {
   const [searchQuery, setSearchQuery] = useState("");
 
-  const filteredGames = games.filter((game) =>
-    game.title.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // const filteredGames = games.filter((game) =>
+  //   game.title.toLowerCase().includes(searchQuery.toLowerCase())
+  // );
 
   const filters = [
     "All",
@@ -37,7 +37,7 @@ export default function SearchPage() {
     <div className="flex min-h-screen flex-col">
       <main className="flex-1">
         <div className="container px-4 py-6">
-          <Navbar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+          {/* <Navbar searchQuery={searchQuery} setSearchQuery={setSearchQuery} /> */}
           <div className="mb-6">
             <div className="flex flex-wrap gap-2">
               {filters.map((filter) => (
@@ -52,7 +52,7 @@ export default function SearchPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {/* <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {filteredGames.length > 0 ? (
               filteredGames.map((game) => (
                 <GameRenderer
@@ -65,7 +65,7 @@ export default function SearchPage() {
             ) : (
               <p className="text-muted-foreground">No games found.</p>
             )}
-          </div>
+          </div> */}
         </div>
       </main>
 

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import React, { useState, use } from "react";
-import { games } from "@/app/data/games";
+
 import GameRenderer from "@/app/games/_clients/GameRenderer";
 import { Navbar } from "@/components/navbar";
 
@@ -16,11 +16,11 @@ export default function CategoryPageClient({
     category.charAt(0).toUpperCase() + category.slice(1);
   const [searchQuery, setSearchQuery] = useState("");
 
-  const filteredGames = games.filter(
-    (game) =>
-      game.category.toLowerCase() === category.toLowerCase() &&
-      game.title.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // const filteredGames = games.filter(
+  //   (game) =>
+  //     game.category.toLowerCase() === category.toLowerCase() &&
+  //     game.title.toLowerCase().includes(searchQuery.toLowerCase())
+  // );
 
   const getCardSize = (gameId: string): "small" | "medium" | "large" => {
     if (typeof window === "undefined") return "small";
@@ -36,10 +36,10 @@ export default function CategoryPageClient({
     <div className="flex min-h-screen flex-col bg-gradient-to-br from-cyan-200 via-blue-200 to-sky-100 text-black">
       <main className="flex-1">
         <div className="container px-4 py-6">
-          <Navbar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+          {/* <Navbar searchQuery={searchQuery} setSearchQuery={setSearchQuery} /> */}
           <h1 className="text-3xl font-bold mb-6">{formattedCategory} Games</h1>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+          {/* <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
             {filteredGames.length > 0 ? (
               filteredGames.map((game) => (
                 <GameRenderer
@@ -53,7 +53,7 @@ export default function CategoryPageClient({
                 No games found in this category.
               </p>
             )}
-          </div>
+          </div> */}
         </div>
       </main>
 
