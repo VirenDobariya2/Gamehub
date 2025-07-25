@@ -24,42 +24,7 @@ interface Notification {
 }
 
 export function NotificationDropdown() {
-  const [notifications, setNotifications] = useState<Notification[]>([
-    {
-      id: "1",
-      type: "new_game",
-      title: "New Game Added",
-      message: "Cosmic Adventure 2 is now available to play!",
-      timestamp: "2 hours ago",
-      read: false,
-      gameId: "cosmic-adventure-2",
-    },
-    {
-      id: "2",
-      type: "favorite_update",
-      title: "Favorite Game Updated",
-      message: "Mystic Run has received a major update with new levels!",
-      timestamp: "1 day ago",
-      read: false,
-      gameId: "mystic-run",
-    },
-    {
-      id: "3",
-      type: "achievement",
-      title: "Achievement Unlocked",
-      message: "You've played 50 different games! Keep exploring!",
-      timestamp: "2 days ago",
-      read: true,
-    },
-    {
-      id: "4",
-      type: "system",
-      title: "Weekly Roundup",
-      message: "Check out this week's most popular games",
-      timestamp: "3 days ago",
-      read: true,
-    },
-  ])
+  const [notifications, setNotifications] = useState<Notification[]>([])
 
   const unreadCount = notifications.filter((n) => !n.read).length
 

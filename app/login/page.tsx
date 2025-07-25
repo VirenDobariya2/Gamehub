@@ -78,8 +78,8 @@ export default function LoginPage() {
       </div>
 
       {/* Login Form */}
-      <div className="relative z-10 w-full md:w-1/2 flex items-center justify-center px-6 py-12 md:px-16 bg-background/90 md:bg-background">
-        <div className="max-w-md w-full mx-auto space-y-6 rounded-lg p-6 shadow-lg bg-card/90 md:bg-card">
+      <div className="relative z-10 w-full md:w-1/2 flex items-center justify-center px-6 py-12 md:px-16 bg-black text-white/90 md:bg-black text-white">
+        <div className="max-w-md w-full mx-auto space-y-6 rounded-lg p-6 shadow-lg border text-white/90 md:border text-white">
           <div className="text-center">
             <Link href="/" className="inline-block">
               <h1 className="text-2xl font-bold text-white">GameHub</h1>
@@ -139,7 +139,7 @@ export default function LoginPage() {
               <div className="w-full border-t border-gray-300"></div>
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-card px-2 text-muted-foreground">Or continue with</span>
+              <span className="border text-white px-2 text-muted-foreground">Or continue with</span>
             </div>
           </div>
 

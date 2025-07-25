@@ -77,7 +77,7 @@ export default function AdminDashboard() {
   ]
 
   return (
-    <div className="flex min-h-screen bg-background">
+    <div className="flex min-h-screen bg-black text-white">
       <AdminSidebar />
       <div className="flex-1">
         <AdminHeader />
@@ -88,7 +88,7 @@ export default function AdminDashboard() {
 
           {/* Stats Cards */}
           <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-3">
-            <Card className="bg-card">
+            <Card className="border text-white">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Total Games</CardTitle>
                 <Gamepad2 className="h-4 w-4 text-muted-foreground" />
@@ -99,7 +99,7 @@ export default function AdminDashboard() {
               </CardContent>
             </Card>
 
-            <Card className="bg-card">
+            <Card className="border text-white">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Active Users</CardTitle>
                 <Users className="h-4 w-4 text-muted-foreground" />
@@ -110,7 +110,7 @@ export default function AdminDashboard() {
               </CardContent>
             </Card>
 
-            <Card className="bg-card">
+            <Card className="border text-white">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Revenue</CardTitle>
                 <DollarSign className="h-4 w-4 text-muted-foreground" />
@@ -126,7 +126,7 @@ export default function AdminDashboard() {
           <div className="mb-8">
             <h2 className="mb-4 text-xl font-bold">User Activity</h2>
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-              <Card className="bg-card">
+              <Card className="border text-white">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Activity className="h-5 w-5" />
@@ -144,7 +144,7 @@ export default function AdminDashboard() {
                 </CardContent>
               </Card>
 
-              <Card className="bg-card">
+              <Card className="border text-white">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <UserPlus className="h-5 w-5" />
@@ -167,7 +167,7 @@ export default function AdminDashboard() {
           {/* Recent Changes */}
           <div>
             <h2 className="mb-4 text-xl font-bold">Recent Changes</h2>
-            <Card className="bg-card">
+            <Card className="border text-white">
               <CardContent className="p-0">
                 <div className="overflow-x-auto">
                   <table className="w-full">

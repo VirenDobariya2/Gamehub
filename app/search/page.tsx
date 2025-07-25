@@ -3,11 +3,10 @@
 import Link from "next/link";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { MainNav } from "@/components/main-nav";
-import { UserNav } from "@/components/user-nav";
 import { SearchBar } from "@/components/search-bar";
 import GameRenderer from "../games/_clients/GameRenderer";
 import { games } from "../data/games";
+import { Navbar } from "@/components/navbar";
 
 export default function SearchPage() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -25,28 +24,20 @@ export default function SearchPage() {
     "Multiplayer",
   ];
 
+  const getCardSize = (gameId: string): "small" | "medium" | "large" => {
+    if (typeof window === "undefined") return "small";
+    return (
+      (localStorage.getItem(`game_size_${gameId}`) as
+        | "small"
+        | "medium"
+        | "large") || "small"
+    );
+  };
   return (
     <div className="flex min-h-screen flex-col">
-      <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur">
-        <div className="container flex h-16 items-center justify-between px-4">
-          <div className="flex items-center gap-6">
-            <Link href="/" className="flex items-center gap-2 font-bold">
-              <span className="text-xl">GameHub</span>
-            </Link>
-            <MainNav />
-          </div>
-          <div className="flex items-center gap-4">
-            <SearchBar
-              searchQuery={searchQuery}
-              setSearchQuery={setSearchQuery}
-            />
-            <UserNav />
-          </div>
-        </div>
-      </header>
-
       <main className="flex-1">
         <div className="container px-4 py-6">
+          <Navbar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
           <div className="mb-6">
             <div className="flex flex-wrap gap-2">
               {filters.map((filter) => (
@@ -65,12 +56,11 @@ export default function SearchPage() {
             {filteredGames.length > 0 ? (
               filteredGames.map((game) => (
                 <GameRenderer
-                  key={game.id}
-                  id={game.id}
-                  title={game.title}
-                  image={game.image}
+                  {...game}
                   video={game.video ?? ""}
-                />
+                  size={getCardSize(game.id)}
+                  thumbnailUrl={game.image}                 
+                />  
               ))
             ) : (
               <p className="text-muted-foreground">No games found.</p>

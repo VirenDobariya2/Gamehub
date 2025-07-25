@@ -1,133 +1,154 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 
-export default function NewGamePage() {
+export default function EditGamePage() {
+  const { id } = useParams();
   const router = useRouter();
-  const [tags, setTags] = useState<string[]>([]);
-  const [newTag, setNewTag] = useState("");
-  const [qaList, setQaList] = useState([{ question: "", answer: "" }]);
 
+  const [loading, setLoading] = useState(true);
   const [gameData, setGameData] = useState({
     title: "",
     category: "",
     description: "",
     gameUrl: "",
-    thumbnailUrl: "", 
-    video: "", 
+    thumbnailUrl: "",
+    video: "",
     instructions: "",
     status: "active",
   });
+  const [tags, setTags] = useState<string[]>([]);
+  const [newTag, setNewTag] = useState("");
+  const [qaList, setQaList] = useState([{ question: "", answer: "" }]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  useEffect(() => {
+    const fetchGame = async () => {
+      try {
+        const res = await fetch(`/api/admin/games/${id}`);
+        if (!res.ok) throw new Error("Failed to fetch game");
+        const data = await res.json();
+
+        // Avoid setting _id
+        setGameData({
+          title: data.title || "",
+          category: data.category || "",
+          description: data.description || "",
+          gameUrl: data.gameUrl || "",
+          thumbnailUrl: data.thumbnailUrl || "",
+          video: data.video || "",
+          instructions: data.instructions || "",
+          status: data.status || "active",
+        });
+
+        setTags(data.tags || []);
+        setQaList(data.qaList || []);
+      } catch (err) {
+        console.error("Fetch error:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (id) fetchGame();
+  }, [id]);
+
+  const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    try {
-      const payload = {
-        ...gameData,
-        instructions: gameData.instructions.trim(),
-        tags,
-        qaList,
-      };
+    const payload = {
+      ...gameData,
+      instructions: gameData.instructions.trim(),
+      tags,
+      qaList,
+    };
 
-      const res = await fetch("/api/admin/games", {
-        method: "POST",
+    console.log("Sending update payload:", payload);
+
+    try {
+      const res = await fetch(`/api/admin/games/${id}`, {
+        method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
 
       if (!res.ok) throw new Error(await res.text());
+
       router.push("/admin/games");
     } catch (err) {
-      console.error("Failed to submit:", err);
+      console.error("Update error:", err);
     }
   };
 
+  if (loading) return <div className="p-6 text-white">Loading...</div>;
+
   return (
-    <div className="max-w-3xl mx-auto p-6 shadow rounded">
-      <h1 className="text-3xl font-bold mb-6 text-center">Add New Game</h1>
-      <form onSubmit={handleSubmit} className="space-y-6">
+    <div className="max-w-3xl mx-auto p-6 shadow rounded text-white">
+      <h1 className="text-3xl font-bold mb-6 text-center">Edit Game</h1>
+      <form onSubmit={handleUpdate} className="space-y-6">
+        {/* All game fields (same as new page, just using gameData state) */}
         <div>
           <Label>Game Title</Label>
           <Input
             value={gameData.title}
             onChange={(e) => setGameData({ ...gameData, title: e.target.value })}
-            required
-            placeholder="Enter game title"
-            className="mb-2 bg-black text-white border border-gray-700"
+            className="bg-black text-white border border-gray-700"
           />
         </div>
-
         <div>
-          <Label>Game Category</Label>
+          <Label>Category</Label>
           <Input
             value={gameData.category}
             onChange={(e) => setGameData({ ...gameData, category: e.target.value })}
-            required
-            placeholder="Enter game category"
-            className="mb-2 bg-black text-white border border-gray-700"
+            className="bg-black text-white border border-gray-700"
           />
         </div>
-
         <div>
-          <Label>Game Description</Label>
+          <Label>Description</Label>
           <Textarea
             value={gameData.description}
             onChange={(e) => setGameData({ ...gameData, description: e.target.value })}
-            required
-            placeholder="Enter game description"
-            className="mb-2 bg-black text-white border border-gray-700"
+            className="bg-black text-white border border-gray-700"
           />
         </div>
-
         <div>
           <Label>Instructions</Label>
           <Textarea
             value={gameData.instructions}
             onChange={(e) => setGameData({ ...gameData, instructions: e.target.value })}
-            required
-            placeholder="Enter game instructions"
-            className="mb-2 bg-black text-white border border-gray-700"
+            className="bg-black text-white border border-gray-700"
           />
         </div>
-
         <div>
-          <Label>Thumbnail Image URL (.jpg/.png)</Label>
+          <Label>Thumbnail URL</Label>
           <Input
             value={gameData.thumbnailUrl}
             onChange={(e) => setGameData({ ...gameData, thumbnailUrl: e.target.value })}
-            required
-            placeholder="Enter image URL"
-            className="mb-2 bg-black text-white border border-gray-700"
+            className="bg-black text-white border border-gray-700"
           />
         </div>
-
         <div>
-          <Label>Game Preview Video (.mp4)</Label>
+          <Label>Video URL</Label>
           <Input
             value={gameData.video}
             onChange={(e) => setGameData({ ...gameData, video: e.target.value })}
-            placeholder="Paste video URL (.mp4)"
-            className="mb-2 bg-black text-white border border-gray-700"
+            className="bg-black text-white border border-gray-700"
           />
         </div>
-
         <div>
-          <Label>Playable Game URL</Label>
+          <Label>Game URL</Label>
           <Input
             value={gameData.gameUrl}
             onChange={(e) => setGameData({ ...gameData, gameUrl: e.target.value })}
-            required
-            placeholder="Enter playable HTML game URL"
-            className="mb-2 bg-black text-white border border-gray-700"
+            className="bg-black text-white border border-gray-700"
           />
         </div>
 
+        {/* Tags */}
         <div>
           <Label>Tags</Label>
           <div className="flex gap-2">
@@ -143,8 +164,8 @@ export default function NewGamePage() {
                   }
                 }
               }}
+              className="bg-black text-white border border-gray-700"
               placeholder="Add tag & press Enter"
-              className="mb-2 bg-black text-white border border-gray-700"
             />
             <Button
               type="button"
@@ -167,6 +188,7 @@ export default function NewGamePage() {
           </div>
         </div>
 
+        {/* Q&A */}
         <div>
           <Label>Q&A</Label>
           {qaList.map((qa, index) => (
@@ -193,16 +215,13 @@ export default function NewGamePage() {
               />
             </div>
           ))}
-          <Button
-            type="button"
-            onClick={() => setQaList([...qaList, { question: "", answer: "" }])}
-          >
+          <Button type="button" onClick={() => setQaList([...qaList, { question: "", answer: "" }])}>
             ➕ Add More Q&A
           </Button>
         </div>
 
         <Button type="submit" className="w-full">
-          Submit Game
+          Update Game
         </Button>
       </form>
     </div>

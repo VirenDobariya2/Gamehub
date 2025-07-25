@@ -1,69 +1,45 @@
-// ✅ HomePage.tsx
 "use client";
 
-import React, { useEffect, useState } from "react";
-import Link from "next/link";
+import { useEffect, useState } from "react";
 import Script from "next/script";
-import { Button } from "@/components/ui/button";
-import { MainNav } from "@/components/main-nav";
-import { UserNav } from "@/components/user-nav";
-import { SearchBar } from "@/components/search-bar";
-import { games as originalGames } from "./data/games";
-import GameRenderer from "./games/_clients/GameRenderer";
+import { SearchModal } from "@/components/SearchModal";
 import VantaBackground from "@/components/VantaBackground";
-
-// Extend Game type locally to include size
-export type Game = {
-  id: string;
-  title: string;
-  image: string;
-  category: string;
-  tags?: string[];
-  playerCount?: number;
-  size?: "small" | "large";
-};
+import GameRenderer from "./games/_clients/GameRenderer";
+import Link from "next/link";
+import { Navbar } from "@/components/navbar";
 
 export default function HomePage() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [recentGames, setRecentGames] = useState<Game[]>([]);
-  const [user, setUser] = useState<{ _id: string; email: string; role?: string } | null>(null);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  interface GameApiType {
+    _id: string;
+    title: string;
+    slug: string;
+    thumbnailUrl: string;
+    video?: string;
+    gameUrl: string;
+  }
+
+  const [games, setGames] = useState<any[]>([]);
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      try {
-        const parsedUser = JSON.parse(storedUser);
-        setUser(parsedUser);
-      } catch (err) {
-        console.error("Failed to parse user from localStorage");
-      }
-    }
+    fetch("/api/admin/games?status=active")
+      .then((res) => res.json())
+      .then((data: GameApiType[]) => {
+        const mapped = data.map((game: GameApiType) => ({
+          id: game._id,
+          title: game.title,
+          slug: game.slug,
+          thumbnailUrl: game.thumbnailUrl,
+          video: game.video,
+          size: localStorage.getItem(`game_size_${game._id}`) || "small",
+          gameUrl: game.gameUrl,
+        }));
+       setGames([...mapped].reverse());
+      });
   }, []);
 
-  useEffect(() => {
-    if (!user || !user.role) return;
-    const recentKey = `recentGames_${user.role}_${user._id}`;
-    const stored = localStorage.getItem(recentKey);
-    if (stored) {
-      setRecentGames(JSON.parse(stored) as Game[]);
-    }
-  }, [user]);
-
-  const handleRecentGame = (game: Game) => {
-    if (!user || !user.role) return;
-    const recentKey = `recentGames_${user.role}_${user._id}`;
-    const current = JSON.parse(localStorage.getItem(recentKey) || "[]") as Game[];
-    const updated = [game, ...current.filter((g) => g.id !== game.id)].slice(0, 6);
-    localStorage.setItem(recentKey, JSON.stringify(updated));
-    setRecentGames(updated);
-  };
-
- const filteredGames = originalGames
-  .map((game, i) => ({
-    ...game,
-   size: (i % 3 === 1 ? "large" : "small") as "large" | "small",
-  }))
-  .filter((game) =>
+  const filteredGames = games.filter((game) =>
     game.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -72,60 +48,46 @@ export default function HomePage() {
       <Script
         id="adsbygoogle-init"
         strategy="afterInteractive"
-        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX"
+        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"
         crossOrigin="anonymous"
       />
-      <div className="relative min-h-screen flex flex-col overflow-hidden text-white bg-gradient-to-br from-cyan-200 via-blue-200 to-sky-100">
+      <div className="relative w-full min-h-screen p-4">
         <VantaBackground />
 
-        <header className="sticky top-0 z-40 border-b bg-white/20 backdrop-blur">
-          <div className="container flex h-16 items-center justify-between px-4">
-            <div className="flex items-center gap-6">
-              <Link href="/" className="text-xl font-bold text-black">
-                GameHub
-              </Link>
-              <MainNav />
+        <div className="container mx-auto px-20 py-10">
+          <div className="relative flex">
+            <div className="fixed top-12 ">
+              <Navbar onSearchClick={() => setIsSearchOpen(true)} />
             </div>
-            <div className="flex items-center gap-4">
-              <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
-              <UserNav />
-            </div>
-          </div>
-        </header>
 
-        <main className="flex-1 relative z-10">
-          <section className="container px-4 py-6">
-            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-4 auto-rows-[1fr]">
-              {filteredGames.length > 0 ? (
-                filteredGames.map((game) => (
+            <main className=" ml-28 w-full">
+              <div className="grid auto-rows-[100px] grid-cols-[repeat(auto-fill,minmax(100px,1fr))] gap-3">
+                {filteredGames.map((game) => (
                   <GameRenderer
                     key={game.id}
-                    {...game}
-                    onPlay={() => handleRecentGame(game)}
+                    id={game.id}
+                    title={game.title}
+                    slug={game.slug}
+                    thumbnailUrl={game.thumbnailUrl}
+                    video={game.video}
+                    size={game.size}
+                    type="home"
                   />
-                ))
-              ) : (
-                <p className="text-center col-span-full text-black">No games found.</p>
-              )}
-            </div>
-            <aside className="mx-auto w-full lg:mx-0 mt-5">
-              <div className="rounded bg-white p-4 shadow">
-                <h2 className="mb-2 text-lg font-semibold text-black">Sponsored</h2>
-                <ins
-                  className="adsbygoogle"
-                  style={{ display: "block" }}
-                  data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
-                  data-ad-slot="1234567890"
-                  data-ad-format="auto"
-                  data-full-width-responsive="true"
-                />
+                ))}
               </div>
-            </aside>
-          </section>
-        </main>
+            </main>
+          </div>
+        </div>
 
-        <footer className="border-t py-6 bg-white/20 backdrop-blur text-black relative z-10">
-          <div className="container px-4 text-center text-sm">
+        <SearchModal
+          isOpen={isSearchOpen}
+          onClose={() => setIsSearchOpen(false)}
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+        />
+
+        <footer className="mt-16 py-6 bg-white/20 backdrop-blur text-black text-center">
+          <div className="max-w-screen-xl mx-auto px-4 text-sm">
             <div className="flex flex-wrap justify-center gap-4 mb-2">
               <Link href="/about">About</Link>
               <Link href="/contact">Contact</Link>

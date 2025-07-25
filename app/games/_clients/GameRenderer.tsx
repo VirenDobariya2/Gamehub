@@ -1,77 +1,89 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useRef } from "react";
-import Image from "next/image";
-import Link from "next/link";
-import type { Game } from "@/app/data/games";
 
-interface GameRendererProps
-  extends Pick<
-    Game,
-    "id" | "title" | "image" | "video" | "playerCount" | "category"
-  > {
+export type GameRendererProps = {
+  id: string;
+  title: string;
+  slug: string;
+  thumbnailUrl: string;
+  video?: string;
   onPlay?: () => void;
-  size?: "small" | "large";
-}
+  type?: string;
+  size?: "small" | "medium" | "large";
+  category?: string;
+  playerCount?: number;
+};
 
 export default function GameRenderer({
   id,
   title,
-  image,
+  slug,
+  thumbnailUrl,
   video,
   onPlay,
+  type = "admin",
   size = "small",
 }: GameRendererProps) {
-  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const router = useRouter();
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  const handleClick = () => {
+    if (!slug) {
+      console.warn(`Slug is undefined for game:`, { id, title });
+      return;
+    }
+    onPlay?.();
+    router.push(`/games/${slug}`);
+  };
 
   const handleMouseEnter = () => {
-    videoRef.current
-      ?.play()
-      .catch(() => console.warn("Video play was interrupted"));
+    videoRef.current?.play().catch(() => {});
   };
 
   const handleMouseLeave = () => {
-    if (videoRef.current) {
-      videoRef.current.pause();
-      videoRef.current.currentTime = 0;
+    videoRef.current?.pause();
+  };
+
+  // Responsive grid span based on size
+  const getGridSpanClass = () => {
+    switch (size) {
+      case "large":
+        return "col-span-3 row-span-3 aspect-square";
+      case "medium":
+        return "col-span-2 row-span-2 aspect-square";
+      default:
+        return "col-span-1 row-span-1 aspect-square";
     }
   };
 
-  const sizeClasses =
-    size === "large" ? "col-span-2 row-span-0 aspect-square" : "aspect-square";
-
   return (
-       <Link
-      href={`/games/${id}`}
-      onClick={onPlay}
-      className={`group relative rounded-xl overflow-hidden shadow-md transition-transform duration-300 hover:scale-105 ${sizeClasses}`}
+    <div
+      className={`relative rounded-xl overflow-hidden shadow-md hover:scale-105 transition-transform cursor-pointer group ${getGridSpanClass()}`}
+      onClick={handleClick}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      <div className="relative w-full h-full bg-black">
-        <Image
-          src={image}
-          alt={title}
-          fill
-          priority
-          className="object-cover transition-opacity duration-300 group-hover:opacity-0"
+      <img
+        src={thumbnailUrl || "/placeholder.svg"}
+        alt={title}
+        className="absolute inset-0 w-full h-full object-cover z-10 transition-opacity duration-300 group-hover:opacity-0"
+      />
+      {video && (
+        <video
+          ref={videoRef}
+          src={video}
+          muted
+          loop
+          playsInline
+          preload="metadata"
+          className="absolute inset-0 w-full h-full object-cover z-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
         />
-        {video && (
-          <video
-            ref={videoRef}
-            muted
-            loop
-            playsInline
-            preload="none"
-            src={video}
-            className="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-300 group-hover:opacity-100 pointer-events-none"
-          />
-        )}
-        <div className="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-center py-1 text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-          {title}
-        </div>
+      )}
+      <div className="absolute bottom-1 text-white font-bold text-sm shadow-sm px-1 rounded opacity-0 group-hover:opacity-100 transition duration-300 pointer-events-none text-center z-20">
+        {title}
       </div>
-    </Link>
-
+    </div>
   );
 }

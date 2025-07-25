@@ -117,7 +117,7 @@ export default function ProfilePage() {
   return (
     <div className="flex min-h-screen flex-col">
       <div className="flex flex-1">
-        <aside className="hidden w-64 flex-col border-r bg-card px-4 py-6 md:flex">
+        <aside className="hidden w-64 flex-col border-r border text-white px-4 py-6 md:flex">
           <div className="mb-6 flex items-center gap-3">
             <Link href="/" className="flex items-center gap-2 font-bold">
               <span className="text-xl">GameHub</span>
@@ -229,7 +229,7 @@ export default function ProfilePage() {
         </aside>
 
         <div className="flex-1">
-          <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur md:hidden">
+          <header className="sticky top-0 z-40 border-b bg-black text-white/95 backdrop-blur md:hidden">
             <div className="container flex h-16 items-center justify-between px-4">
               <div className="flex items-center gap-6">
                 <Link href="/" className="flex items-center gap-2 font-bold">

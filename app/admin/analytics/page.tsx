@@ -37,7 +37,7 @@ export default function AdminAnalyticsPage() {
 
   return (
     <AdminRouteGuard>
-      <div className="flex min-h-screen bg-background">
+      <div className="flex min-h-screen bg-black text-white">
         <AdminSidebar />
         <div className="flex-1">
           <AdminHeader />
@@ -47,9 +47,9 @@ export default function AdminAnalyticsPage() {
               <p className="text-muted-foreground">Platform performance and user insights</p>
             </div>
 
-            {/* Key Metrics */}
+             {/* Key Metrics */}
             <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-              <Card>
+              <Card className="border text-white">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">Total Users</CardTitle>
                   <Users className="h-4 w-4 text-muted-foreground" />
@@ -60,7 +60,7 @@ export default function AdminAnalyticsPage() {
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className="border text-white">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">Active Users</CardTitle>
                   <TrendingUp className="h-4 w-4 text-muted-foreground" />
@@ -71,7 +71,7 @@ export default function AdminAnalyticsPage() {
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className="border text-white">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">Total Games</CardTitle>
                   <Gamepad2 className="h-4 w-4 text-muted-foreground" />
@@ -82,7 +82,7 @@ export default function AdminAnalyticsPage() {
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className="border text-white">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">Avg Session Time</CardTitle>
                   <Clock className="h-4 w-4 text-muted-foreground" />
@@ -96,7 +96,7 @@ export default function AdminAnalyticsPage() {
 
             <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
               {/* Top Games */}
-              <Card>
+              <Card className="border text-white">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Eye className="h-5 w-5" />
@@ -124,7 +124,7 @@ export default function AdminAnalyticsPage() {
               </Card>
 
               {/* Game Categories */}
-              <Card>
+              <Card className="border text-white">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Gamepad2 className="h-5 w-5" />
@@ -155,7 +155,7 @@ export default function AdminAnalyticsPage() {
               </Card>
 
               {/* User Growth Chart */}
-              <Card className="lg:col-span-2">
+              <Card className="lg:col-span-2 border text-white">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <TrendingUp className="h-5 w-5" />

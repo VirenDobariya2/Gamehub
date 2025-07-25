@@ -56,7 +56,7 @@ export function FavoriteButton({
       <div className="relative group inline-block">
         <button
           onClick={handleToggleFavorite}
-          className={`p-2 rounded-full border border-transparent bg-transparent hover:bg-transparent focus:outline-none ${className}`}
+          className={`p-2 rounded-full border  border-transparent bg-transparent hover:bg-transparent focus:outline-none ${className}`}
         >
           <Heart
             className={`h-5 w-5 transition ${
@@ -87,7 +87,7 @@ export function FavoriteButton({
           }`}
         />
 
-        <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity z-10 whitespace-nowrap">
+        <span className="absolute bottom-full mb-2 left-1/2  -translate-x-1/2  text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity z-10 whitespace-nowrap bg-white">
           {isGameFavorite ? "Unfavorite" : "Favorite"}
         </span>
       </button>

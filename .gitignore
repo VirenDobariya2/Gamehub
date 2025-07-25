@@ -9,6 +9,8 @@
 
 # production
 /build
+/extra-files
+/gamepage.tsx
 
 # debug
 npm-debug.log*

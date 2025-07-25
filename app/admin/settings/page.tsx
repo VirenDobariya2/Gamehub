@@ -35,7 +35,7 @@ export default function AdminSettingsPage() {
     analyticsId: "",
   })
 
-  const handleSave = (section) => {
+  const handleSave = (section: string) => {
     toast({
       title: "Settings saved",
       description: `${section} settings have been updated successfully.`,
@@ -44,7 +44,7 @@ export default function AdminSettingsPage() {
 
   return (
     <AdminRouteGuard>
-      <div className="flex min-h-screen bg-background">
+      <div className="flex min-h-screen bg-black text-white">
         <AdminSidebar />
         <div className="flex-1">
           <AdminHeader />
@@ -56,7 +56,7 @@ export default function AdminSettingsPage() {
 
             <Tabs defaultValue="general" className="space-y-6">
               <TabsList className="grid w-full grid-cols-5">
-                <TabsTrigger value="general">General</TabsTrigger>
+                <TabsTrigger value="general" className="text-black">General</TabsTrigger>
                 <TabsTrigger value="security">Security</TabsTrigger>
                 <TabsTrigger value="email">Email</TabsTrigger>
                 <TabsTrigger value="uploads">Uploads</TabsTrigger>
@@ -65,7 +65,7 @@ export default function AdminSettingsPage() {
 
               {/* General Settings */}
               <TabsContent value="general">
-                <Card>
+                <Card className="border text-white">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <Globe className="h-5 w-5" />
@@ -119,7 +119,7 @@ export default function AdminSettingsPage() {
 
               {/* Security Settings */}
               <TabsContent value="security">
-                <Card>
+                <Card className="border text-white">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <Shield className="h-5 w-5" />
@@ -179,7 +179,7 @@ export default function AdminSettingsPage() {
 
               {/* Email Settings */}
               <TabsContent value="email">
-                <Card>
+                <Card className="border text-white">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <Mail className="h-5 w-5" />
@@ -232,7 +232,7 @@ export default function AdminSettingsPage() {
 
               {/* Upload Settings */}
               <TabsContent value="uploads">
-                <Card>
+                <Card className="border text-white">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <Database className="h-5 w-5" />
@@ -269,7 +269,7 @@ export default function AdminSettingsPage() {
 
               {/* Analytics Settings */}
               <TabsContent value="analytics">
-                <Card>
+                <Card className="border text-white">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <TrendingUp className="h-5 w-5" />

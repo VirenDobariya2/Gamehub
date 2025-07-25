@@ -202,7 +202,7 @@ export default function SignupPage() {
             <div className="w-full border-t border-gray-300" />
           </div>
           <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-card px-2 text-muted-foreground">Or continue with</span>
+            <span className="border text-white px-2 text-muted-foreground">Or continue with</span>
           </div>
         </div>
 

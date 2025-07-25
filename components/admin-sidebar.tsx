@@ -32,18 +32,14 @@ const sidebarItems = [
     href: "/admin/settings",
     icon: Settings,
   },
-  {
-    title: "Support",
-    href: "/admin/support",
-    icon: HelpCircle,
-  },
+
 ]
 
 export function AdminSidebar() {
   const pathname = usePathname()
 
   return (
-    <div className="flex h-screen w-64 flex-col bg-card border-r">
+    <div className="flex h-screen w-64 flex-col bg-black text-white border-r">
       <div className="p-6">
         <h2 className="text-lg font-semibold">GameHub Admin</h2>
       </div>
@@ -59,7 +55,7 @@ export function AdminSidebar() {
               href={item.href}
               className={cn(
                 "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors",
-                isActive ? "bg-secondary text-white" : "text-muted-foreground hover:bg-secondary hover:text-white",
+                isActive ? "bg-secondary text-black" : "text-muted-foreground hover:bg-secondary hover:text-black",
               )}
             >
               <Icon className="h-4 w-4" />

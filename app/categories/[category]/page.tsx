@@ -2,11 +2,9 @@
 
 import Link from "next/link";
 import React, { useState, use } from "react";
-import { MainNav } from "@/components/main-nav";
-import { UserNav } from "@/components/user-nav";
-import { SearchBar } from "@/components/search-bar";
 import { games } from "@/app/data/games";
 import GameRenderer from "@/app/games/_clients/GameRenderer";
+import { Navbar } from "@/components/navbar";
 
 export default function CategoryPageClient({
   params,
@@ -24,44 +22,36 @@ export default function CategoryPageClient({
       game.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const getCardSize = (gameId: string): "small" | "medium" | "large" => {
+    if (typeof window === "undefined") return "small";
+    return (
+      (localStorage.getItem(`game_size_${gameId}`) as
+        | "small"
+        | "medium"
+        | "large") || "small"
+    );
+  };
+
   return (
     <div className="flex min-h-screen flex-col bg-gradient-to-br from-cyan-200 via-blue-200 to-sky-100 text-black">
-      <header className="sticky top-0 z-40 border-b bg-white/30 backdrop-blur">
-        <div className="container flex h-16 items-center justify-between px-4">
-          <div className="flex items-center gap-6">
-            <Link href="/" className="flex items-center gap-2 font-bold text-black">
-              <span className="text-xl">GameHub</span>
-            </Link>
-            <MainNav />
-          </div>
-          <div className="flex items-center gap-4">
-            <SearchBar
-              searchQuery={searchQuery}
-              setSearchQuery={setSearchQuery}
-            />
-            <UserNav />
-          </div>
-        </div>
-      </header>
-
       <main className="flex-1">
         <div className="container px-4 py-6">
+          <Navbar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
           <h1 className="text-3xl font-bold mb-6">{formattedCategory} Games</h1>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
             {filteredGames.length > 0 ? (
               filteredGames.map((game) => (
                 <GameRenderer
-                  key={game.id}
-                  id={game.id}
-                  title={game.title}
-                  image={game.image}
+                  {...game}
                   video={game.video ?? ""}
-                  category={game.category}
+                  size={getCardSize(game.id)}
                 />
               ))
             ) : (
-              <p className="text-muted-foreground">No games found in this category.</p>
+              <p className="text-muted-foreground">
+                No games found in this category.
+              </p>
             )}
           </div>
         </div>

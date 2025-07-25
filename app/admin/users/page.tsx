@@ -63,7 +63,7 @@ export default function AdminUsersPage() {
 
   return (
     <AdminRouteGuard>
-      <div className="flex min-h-screen bg-background">
+      <div className="flex min-h-screen bg-black text-white">
         <AdminSidebar />
         <div className="flex-1">
           <AdminHeader />
@@ -82,7 +82,7 @@ export default function AdminUsersPage() {
               />
             </div>
 
-            <Card>
+            <Card className="border text-white">
               <CardHeader>
                 <CardTitle>All Users</CardTitle>
                 <div className="text-sm text-muted-foreground">

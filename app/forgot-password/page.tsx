@@ -95,7 +95,7 @@ export default function ForgotPasswordPage() {
           </Button>
         </div>
 
-        <Card className="bg-card shadow-lg">
+        <Card className="border text-white shadow-lg">
           <CardHeader className="text-center">
             <Link href="/" className="inline-block mb-4">
               <h1 className="text-2xl font-bold">GameHub</h1>
